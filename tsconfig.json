@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "lib": ["es2017", "dom"],
+    "types": ["jest"],
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "allowJs": false,
+    "strict": true,
+    "sourceMap": true,
+    "outDir": "./dist"
+  },
+  "include": ["./src"]
+}

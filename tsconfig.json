@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "./build",
+    "rootDir": ".",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "allowJs": false,
+    "sourceMap": true,
+    "paths": {
+      "*": ["./node_modules/*"]
+    }
+  },
+  "include": ["src/**/*", "example/index.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

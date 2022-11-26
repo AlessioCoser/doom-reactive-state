@@ -11,15 +11,16 @@ function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
   return (function () {
     var state: T = initial
     const accessor: Accessor<T> = function accessor() {
-      // console.log('accessor ctx', this)
+      // console.log('accessor ctx', this.id, this.fn)
       if(toBeObserved(this)) {
         observers.push(this)
       }
+
       return state
     }
 
     const setter: Setter<T> = function setter(v: T): void {
-      // console.log('setter ctx', this)
+      // console.log('accessor ctx', this.id, this.fn)
       state = v
       observers.forEach(({id, fn}) => {
         if (this.id !== id) {
@@ -48,13 +49,15 @@ function bind(s: Observer, ...args: any[]){
 
 type Observer = {id: number, fn: () => void}
 let rIndex: number = 0
-function r(f: (...args: any[]) => void, ...args: any[]): void {
+function r<T>(f: T): T {
   rIndex += 1
   const s: Observer = { id: rIndex, fn: () => {} }
-  const binded = bind(s, ...args)
-  const fb = f.bind(s)
-  s.fn = () => fb(...binded)
-  s.fn()
+  return (function(...args: any[]) {
+    const binded = bind(s, ...args)
+    const fb = (f as Function).bind(s)
+    s.fn = () => fb(...binded)
+    s.fn()
+  } as T)
 }
 
 function h(val: Accessor<string>, two: Accessor<number>, setTwo: Setter<number>){
@@ -72,10 +75,10 @@ function main () {
   const [two, setTwo] = useState(0)
 
   // also functions inside objects are binded
-  r(count, {num: two})
+  r(count)({num: two})
 
   // use a lambda if you don't want to react to the state change'
-  r(h, val, () => two(), setTwo)
+  r(h)(val, () => two(), setTwo)
 
   setter('updated')
 

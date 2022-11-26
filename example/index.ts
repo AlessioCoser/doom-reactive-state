@@ -1,76 +1,10 @@
-type Accessor<T> = () => T
-type Setter<T> = (v: T) => void
-
-function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
-  const observers: Observer[] = []
-
-  const toBeObserved = (observer: Observer | null) => {
-    if (!observer || !observer.id) return false
-    return !observers.some(obs => obs.id === observer.id)
-  }
-
-  return (function () {
-    var state: T = initial
-    const accessor: Accessor<T> = function accessor() {
-      if(toBeObserved(currentObserver)) {
-        observers.push(currentObserver)
-      }
-      return state
-    }
-
-    const setter: Setter<T> = function setter(newState: T): void {
-      state = newState
-      if (!currentObserver) {
-        observers.forEach(obs => obs.component())
-        return
-      }
-
-      observers
-        .filter(obs => obs.id !== currentObserver.id)
-        .forEach(obs => currentObserver.deferred.push(obs.component))
-    }
-
-    return [accessor, setter]
-  })()
-}
-
-type Component = (...x: any) => HTMLElement
-
-type Observer = {id: string, component: Component, deferred: (() => void)[]}
-let currentObserver: Observer | null = null
-let previousObserver: Observer | null = null
-
-function createObserver(id: string, component: Component): Observer {
-  return {
-    id,
-    deferred: [],
-    component() {
-      this.deferred = []
-      previousObserver = currentObserver
-      currentObserver = this;
-      const result = component.bind({id})()
-      const deferred = currentObserver.deferred
-      currentObserver = previousObserver
-      deferred.forEach(fn => fn())
-      return result
-    }
-  }
-}
-
-// Here we must pass a NON ARROW function as argument of reactive
-const reactive: Component = (function reactive() {
-  let reactiveIndex: number = 1
-  return function reactive(component: Component): HTMLElement {
-    const id = reactiveIndex++
-    const s = createObserver(id.toString(), component)
-    return s.component()
-  }
-})()
+import { Component, reactive, root, useState } from './engine'
 
 type Prop<T> = () => T | T
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, onclick: PropEvent }
+// We must pass a NON ARROW function as argument of reactive function
 const Button: Component = (props: ButtonProps) => reactive(function () {
   const el = getOrCreate(this.id, "button") as HTMLButtonElement
   el.innerText = evaluate(props.text)
@@ -85,6 +19,7 @@ const Button: Component = (props: ButtonProps) => reactive(function () {
 })
 
 type H2Props = { text: Prop<string> }
+// We must pass a NON ARROW function as argument of reactive function
 const H2: Component = (props: H2Props) => reactive(function () {
   const el = getOrCreate(this.id, "h2")
   el.innerText = evaluate(props.text)
@@ -92,16 +27,12 @@ const H2: Component = (props: H2Props) => reactive(function () {
 })
 
 type DivProps = { children: HTMLElement[] }
+// We must pass a NON ARROW function as argument of reactive function
 const Div: Component = (props: DivProps) => reactive(function () {
   const el = getOrCreate(this.id, "div")
   props.children.forEach(child => el.appendChild(child))
   return el
 })
-
-type Root = (child: Component) => void
-const root: Root = (child) => {
-  document.body.appendChild(child())
-}
 
 function evaluate<T>(prop: Prop<T>): T {
   if(typeof prop === 'function'){

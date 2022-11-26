@@ -43,12 +43,12 @@ type Observer = {id: string, fn: FC, deferred: (() => void)[]}
 let currentObserver: Observer | null = null
 let previousObserver: Observer | null = null
 
-const r: FC = (function r() {
+const reactive: FC = (function r() {
   let rIndex: number = 0
 
-  return function r(component: FC): HTMLElement {
+  return function reactive(component: FC): HTMLElement {
     rIndex += 1
-    const id = `${rIndex}-${component.name}`
+    const id = rIndex.toString()
     const s: Observer = {
       id,
       fn() {
@@ -72,7 +72,7 @@ type HtmlAction = (ev: MouseEvent) => Promise<void> | void
 
 type HOptions = { text: Prop<string>, onclick: HtmlAction }
 const h: FC = ({text, onclick}): HTMLElement => {
-  return r(function h () {
+  return reactive(function () {
     const el = getOrCreate(this.id, "button") as HTMLButtonElement
     el.innerText = evaluate(text)
     el.onclick = async (e) => {
@@ -87,8 +87,8 @@ const h: FC = ({text, onclick}): HTMLElement => {
 }
 
 type CountOptions = { text: Prop<string> }
-function count({ text }: CountOptions) : HTMLElement{
-  return r(function count() {
+const count: FC = ({ text }: CountOptions) : HTMLElement => {
+  return reactive(function () {
     const el = getOrCreate(this.id, "h2")
     el.innerText = evaluate(text)
     return el
@@ -96,15 +96,16 @@ function count({ text }: CountOptions) : HTMLElement{
 }
 
 type DivOptions = { children: HTMLElement[] }
-function div({children}: DivOptions): HTMLElement {
-  return r(function div() {
+const div: FC = ({children}: DivOptions): HTMLElement => {
+  return reactive(function () {
     const el = getOrCreate(this.id, "div")
     children.forEach(child => el.appendChild(child))
     return el
   })
 }
 
-function root(child: () => HTMLElement) {
+type Root = (child: () => HTMLElement) => void
+const root: Root = (child) => {
   document.body.appendChild(child())
 }
 
@@ -115,13 +116,13 @@ function evaluate<T>(prop: Prop<T>): T {
   return prop
 }
 
-function createElement(id:string, tag:string): HTMLElement {
+function createElement(id: string, tag: string): HTMLElement {
   const element = document.createElement(tag)
   element.setAttribute('_id', id)
   return element
 }
 
-function getOrCreate(id:string, tag:string): HTMLElement {
+function getOrCreate(id: string, tag: string): HTMLElement {
   return document.querySelector(`[_id="${id}"]`) || createElement(id, tag)
 }
 

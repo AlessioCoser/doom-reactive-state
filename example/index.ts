@@ -11,23 +11,24 @@ function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
   return (function () {
     var state: T = initial
     const accessor: Accessor<T> = function accessor() {
-      // console.log('accessor ctx', this.id, this.fn)
-      if(toBeObserved(this)) {
-        observers.push(this)
+      console.log('accessor ctx', currentObserver?.id, currentObserver?.fn)
+      if(currentObserver && toBeObserved(currentObserver)) {
+        observers.push(currentObserver)
       }
 
       return state
     }
 
     const setter: Setter<T> = function setter(v: T): void {
-      // console.log('accessor ctx', this.id, this.fn, this.deferred)
+      console.log('accessor ctx', currentObserver?.id, currentObserver?.fn, currentObserver?.deferred)
+      console.log('observers', observers)
       state = v
       observers.forEach(({id, fn}) => {
-        if (this.id !== id) {
-          if(this.deferred) {
-            this.deferred.push(fn)
-          } else {
-            fn()
+        if(!currentObserver) {
+          fn()
+        } else if (currentObserver?.id !== id) {
+          if(currentObserver?.deferred) {
+            currentObserver?.deferred.push(fn)
           }
         }
       })
@@ -37,35 +38,23 @@ function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
   })()
 }
 
-function bindSingle(s: Observer, a: any){
-  if(typeof a === 'function') {
-    return a.bind(s)
-  }
-  if (typeof a === 'object') {
-    Object.getOwnPropertyNames(a).forEach(key => a[key] = bindSingle(s, a[key]))
-  }
-  return a
-}
-
-function bind(s: Observer, ...args: any[]){
-  return args.map(a => bindSingle(s, a))
-}
-
-type Observer = {id: number, fn: () => void, deferred: (() => void)[]}
-
+type Observer = {id: string, fn: () => void, deferred: (() => void)[]}
+let currentObserver: Observer | null = null
 const r: <T>(f: T) => T = (function r() {
   let rIndex: number = 0
 
   return function r<T>(f: T): T {
     rIndex += 1
-    const s: Observer = { id: rIndex, fn: () => {}, deferred: [] }
+    const id = `${rIndex}-${(f as Function).name}`
+    const s: Observer = { id: id, fn: () => {}, deferred: [] }
     return (function(...args: any[]) {
-      const binded = bind(s, ...args)
-      const fb = (f as Function).bind(s)
       s.fn = () => {
         s.deferred = []
-        fb(...binded)
-        s.deferred.forEach(fn => fn())
+        currentObserver = s;
+        (f as Function)(...args)
+        const d = currentObserver.deferred
+        currentObserver = null
+        d.forEach(fn => fn())
       }
       s.fn()
     } as T)
@@ -73,9 +62,9 @@ const r: <T>(f: T) => T = (function r() {
 })()
 
 
-function h(val: Accessor<string>, two: Accessor<number>, setTwo: Setter<number>){
+function h(val: Accessor<string>, increase: Function){
   console.log(`rendered ${val()}`)
-  setTwo(two() + 1 )
+  increase()
 }
 
 function count({ num }: {num: Accessor<number>}) {
@@ -87,11 +76,15 @@ function main () {
   const [val, setter] = useState('initial')
   const [two, setTwo] = useState(0)
 
+  const increase = () => {
+    setTwo(two() + 1)
+  }
+
   // also functions inside objects are binded
   r(count)({num: two})
 
-  // use a lambda if you don't want to react to the state change'
-  r(h)(val, () => two(), setTwo)
+  // You can't avoid reacting on a used state change
+  r(h)(val, increase)
 
   setter('updated')
 

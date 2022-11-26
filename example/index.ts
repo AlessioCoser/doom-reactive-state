@@ -1,110 +1,104 @@
 type Accessor<T> = () => T
 type Setter<T> = (v: T) => void
+
 function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
   const observers: Observer[] = []
 
-  const toBeObserved = ({ id }: Observer) => {
-    if (!id) return false
-    return !observers.some(obs => obs.id === id)
+  const toBeObserved = (observer: Observer | null) => {
+    if (!observer || !observer.id) return false
+    return !observers.some(obs => obs.id === observer.id)
   }
 
   return (function () {
     var state: T = initial
     const accessor: Accessor<T> = function accessor() {
-      // console.log('accessor ctx', currentObserver?.id)
-      if(currentObserver && toBeObserved(currentObserver)) {
+      if(toBeObserved(currentObserver)) {
         observers.push(currentObserver)
       }
-
       return state
     }
 
-    const setter: Setter<T> = function setter(v: T): void {
-      // console.log('accessor ctx', currentObserver?.id, currentObserver?.deferred)
-      state = v
-      observers.forEach(({id, fn}) => {
-        if(!currentObserver) {
-          fn()
-        } else if (currentObserver?.id !== id) {
-          if(currentObserver?.deferred) {
-            currentObserver?.deferred.push(fn)
-          }
-        }
-      })
+    const setter: Setter<T> = function setter(newState: T): void {
+      state = newState
+      if (!currentObserver) {
+        observers.forEach(obs => obs.component())
+        return
+      }
+
+      observers
+        .filter(obs => obs.id !== currentObserver.id)
+        .forEach(obs => currentObserver.deferred.push(obs.component))
     }
 
     return [accessor, setter]
   })()
 }
 
-type FC = (...x: any) => HTMLElement
+type Component = (...x: any) => HTMLElement
 
-type Observer = {id: string, fn: FC, deferred: (() => void)[]}
+type Observer = {id: string, component: Component, deferred: (() => void)[]}
 let currentObserver: Observer | null = null
 let previousObserver: Observer | null = null
 
-const reactive: FC = (function r() {
-  let rIndex: number = 0
-
-  return function reactive(component: FC): HTMLElement {
-    rIndex += 1
-    const id = rIndex.toString()
-    const s: Observer = {
-      id,
-      fn() {
-        this.deferred = []
-        previousObserver = currentObserver
-        currentObserver = this;
-        const result = component.bind({id})()
-        const deferred = currentObserver.deferred
-        currentObserver = previousObserver
-        deferred.forEach(fn => fn())
-        return result
-      },
-      deferred: []
+function createObserver(id: string, component: Component): Observer {
+  return {
+    id,
+    deferred: [],
+    component() {
+      this.deferred = []
+      previousObserver = currentObserver
+      currentObserver = this;
+      const result = component.bind({id})()
+      const deferred = currentObserver.deferred
+      currentObserver = previousObserver
+      deferred.forEach(fn => fn())
+      return result
     }
-    return s.fn()
+  }
+}
+
+// Here we must pass a NON ARROW function as argument of reactive
+const reactive: Component = (function reactive() {
+  let reactiveIndex: number = 1
+  return function reactive(component: Component): HTMLElement {
+    const id = reactiveIndex++
+    const s = createObserver(id.toString(), component)
+    return s.component()
   }
 })()
 
 type Prop<T> = () => T | T
-type HtmlAction = (ev: MouseEvent) => Promise<void> | void
+type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
-type HOptions = { text: Prop<string>, onclick: HtmlAction }
-const h: FC = ({text, onclick}): HTMLElement => {
-  return reactive(function () {
-    const el = getOrCreate(this.id, "button") as HTMLButtonElement
-    el.innerText = evaluate(text)
-    el.onclick = async (e) => {
-      el.innerText = 'loading'
-      el.disabled=true
-      await onclick(e)
-      el.innerText = evaluate(text)
-      el.disabled=false
-    }
-    return el
-  })
-}
+type ButtonProps = { text: Prop<string>, onclick: PropEvent }
+const Button: Component = (props: ButtonProps) => reactive(function () {
+  const el = getOrCreate(this.id, "button") as HTMLButtonElement
+  el.innerText = evaluate(props.text)
+  el.onclick = async (e) => {
+    el.innerText = 'loading'
+    el.disabled=true
+    await props.onclick(e)
+    el.innerText = evaluate(props.text)
+    el.disabled=false
+  }
+  return el
+})
 
-type CountOptions = { text: Prop<string> }
-const count: FC = ({ text }: CountOptions) : HTMLElement => {
-  return reactive(function () {
-    const el = getOrCreate(this.id, "h2")
-    el.innerText = evaluate(text)
-    return el
-  })
-}
+type H2Props = { text: Prop<string> }
+const H2: Component = (props: H2Props) => reactive(function () {
+  const el = getOrCreate(this.id, "h2")
+  el.innerText = evaluate(props.text)
+  return el
+})
 
-type DivOptions = { children: HTMLElement[] }
-const div: FC = ({children}: DivOptions): HTMLElement => {
-  return reactive(function () {
-    const el = getOrCreate(this.id, "div")
-    children.forEach(child => el.appendChild(child))
-    return el
-  })
-}
+type DivProps = { children: HTMLElement[] }
+const Div: Component = (props: DivProps) => reactive(function () {
+  const el = getOrCreate(this.id, "div")
+  props.children.forEach(child => el.appendChild(child))
+  return el
+})
 
-type Root = (child: () => HTMLElement) => void
+type Root = (child: Component) => void
 const root: Root = (child) => {
   document.body.appendChild(child())
 }
@@ -126,8 +120,9 @@ function getOrCreate(id: string, tag: string): HTMLElement {
   return document.querySelector(`[_id="${id}"]`) || createElement(id, tag)
 }
 
-function main () {
-  // use state must be out of rerender loop
+const main: Component = () => {
+  // this is a non-reactive component it's out of therenderer loop since it isn't wrapped with the reactive function
+  // here we can instantiate the state (!! never instantiate a state in a reactive component !!)
   const [val, setter] = useState('initial')
   const [two, setTwo] = useState(0)
 
@@ -140,20 +135,19 @@ function main () {
       setTimeout(()=>{
         increase()
         resolve(null)
-      }, 5000)
+      }, 1000)
     })
   }
 
   setTimeout(() => setter('updated'), 2000)
-
   setTimeout(increase, 5000)
 
-  return div({children:[
+  return Div({ children: [
     // only functions inside objects are binded
     // all computed properties must be functions
-    count({text: () => `count ${two()}`}),
+    H2({ text: () => `count ${two()}` }),
     // to avoid reacting you should not wrap text value in lambda you should handle it in h
-    h({text: `render ${val()}`, onclick: asyncIncrease})
+    Button({ text: `render ${val()}`, onclick: asyncIncrease })
   ]})
 }
 

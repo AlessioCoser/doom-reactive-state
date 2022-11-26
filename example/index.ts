@@ -52,21 +52,26 @@ function bind(s: Observer, ...args: any[]){
 }
 
 type Observer = {id: number, fn: () => void, deferred: (() => void)[]}
-let rIndex: number = 0
-function r<T>(f: T): T {
-  rIndex += 1
-  const s: Observer = { id: rIndex, fn: () => {}, deferred: [] }
-  return (function(...args: any[]) {
-    const binded = bind(s, ...args)
-    const fb = (f as Function).bind(s)
-    s.fn = () => {
-      s.deferred = []
-      fb(...binded)
-      s.deferred.forEach(fn => fn())
-    }
-    s.fn()
-  } as T)
-}
+
+const r: <T>(f: T) => T = (function r() {
+  let rIndex: number = 0
+
+  return function r<T>(f: T): T {
+    rIndex += 1
+    const s: Observer = { id: rIndex, fn: () => {}, deferred: [] }
+    return (function(...args: any[]) {
+      const binded = bind(s, ...args)
+      const fb = (f as Function).bind(s)
+      s.fn = () => {
+        s.deferred = []
+        fb(...binded)
+        s.deferred.forEach(fn => fn())
+      }
+      s.fn()
+    } as T)
+  }
+})()
+
 
 function h(val: Accessor<string>, two: Accessor<number>, setTwo: Setter<number>){
   console.log(`rendered ${val()}`)

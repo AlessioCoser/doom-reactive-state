@@ -20,11 +20,15 @@ function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
     }
 
     const setter: Setter<T> = function setter(v: T): void {
-      // console.log('accessor ctx', this.id, this.fn)
+      // console.log('accessor ctx', this.id, this.fn, this.deferred)
       state = v
       observers.forEach(({id, fn}) => {
         if (this.id !== id) {
-          fn()
+          if(this.deferred) {
+            this.deferred.push(fn)
+          } else {
+            fn()
+          }
         }
       })
     }
@@ -47,15 +51,19 @@ function bind(s: Observer, ...args: any[]){
   return args.map(a => bindSingle(s, a))
 }
 
-type Observer = {id: number, fn: () => void}
+type Observer = {id: number, fn: () => void, deferred: (() => void)[]}
 let rIndex: number = 0
 function r<T>(f: T): T {
   rIndex += 1
-  const s: Observer = { id: rIndex, fn: () => {} }
+  const s: Observer = { id: rIndex, fn: () => {}, deferred: [] }
   return (function(...args: any[]) {
     const binded = bind(s, ...args)
     const fb = (f as Function).bind(s)
-    s.fn = () => fb(...binded)
+    s.fn = () => {
+      s.deferred = []
+      fb(...binded)
+      s.deferred.forEach(fn => fn())
+    }
     s.fn()
   } as T)
 }
@@ -82,7 +90,7 @@ function main () {
 
   setter('updated')
 
-  setTimeout(() => setTwo(two() + 1), 400)
+  setTimeout(() => setTwo(two() + 1), 1000)
 }
 
 main()

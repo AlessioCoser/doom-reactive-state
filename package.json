@@ -4,7 +4,6 @@
   "description": "",
   "scripts": {
     "dev": "parcel example/index.html",
-    "test": "ts-node example/index.ts",
     "build": "rm -rf dist && parcel build example/index.html"
   },
   "author": "Alessio Coser",

@@ -3,18 +3,13 @@ import { Component, reactive, root, useState } from './engine'
 type Prop<T> = () => T | T
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
-type ButtonProps = { text: Prop<string>, onclick: PropEvent }
+type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
 // We must pass a NON ARROW function as argument of reactive function
 const Button: Component = (props: ButtonProps) => reactive(function () {
   const el = getOrCreate(this.id, "button") as HTMLButtonElement
   el.innerText = evaluate(props.text)
-  el.onclick = async (e) => {
-    el.innerText = 'loading'
-    el.disabled=true
-    await props.onclick(e)
-    el.innerText = evaluate(props.text)
-    el.disabled=false
-  }
+  el.disabled=evaluate(props.disabled)
+  el.onclick = props.onclick
   return el
 })
 
@@ -51,35 +46,45 @@ function getOrCreate(id: string, tag: string): HTMLElement {
   return document.querySelector(`[_id="${id}"]`) || createElement(id, tag)
 }
 
-const main: Component = () => {
+const Main: Component = ({counter}) => {
   // this is a non-reactive component it's out of therenderer loop since it isn't wrapped with the reactive function
   // here we can instantiate the state (!! never instantiate a state in a reactive component !!)
-  const [val, setter] = useState('initial')
-  const [two, setTwo] = useState(0)
+  const [btnText, setBtnText] = useState('initial text')
+  const [isLoading, setIsLoading] = useState(false)
+  const [count, setCount] = counter
 
-  const increase = () => {
-    setTwo(two() + 1)
-  }
+  // we can use setTimeout and setInterval outside re-rendered components
+  setTimeout(() => setBtnText('updated text'), 2000)
+  setTimeout(() => setCount(count() + 1), 5000)
 
-  const asyncIncrease = async () => {
+  const asyncOperation = async () => {
     return new Promise((resolve) => {
-      setTimeout(()=>{
-        increase()
-        resolve(null)
-      }, 1000)
+      setTimeout(() => resolve(null), 1000)
     })
   }
 
-  setTimeout(() => setter('updated'), 2000)
-  setTimeout(increase, 5000)
+  const onButtonClick = async () => {
+    setIsLoading(true)
+    await asyncOperation()
+    setCount(count() + 1)
+    setIsLoading(false)
+  }
 
   return Div({ children: [
     // only functions inside objects are binded
     // all computed properties must be functions
-    H2({ text: () => `count ${two()}` }),
-    // to avoid reacting you should not wrap text value in lambda you should handle it in h
-    Button({ text: `render ${val()}`, onclick: asyncIncrease })
+    H2({ text: () => `count ${count()}` }),
+    // you can avoid the element reacting for a specific property: see text property, we pass it directly without any function
+    // but since the state accessor is a function you can pass it directly and still react to it's change
+    Button({ text: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick })
   ]})
 }
 
-root(main)
+const App = () => {
+  // you can pass the state through all the components,
+  // but will be re-rendered only the components that really access it
+  const counter = useState(0)
+  return Main({ counter })
+}
+
+root(App)

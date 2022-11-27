@@ -1,4 +1,5 @@
-type EffectsRegistry = { runAll: () => void, register: (effect: Effect<any> | null) => void}
+import { Accessor, Effect, EffectsRegistry, Setter, Signal } from './types'
+
 const createEffectsRegistry: (() => EffectsRegistry) = () => {
   const registeredEffects: Effect<any>[] = []
 
@@ -17,9 +18,6 @@ const createEffectsRegistry: (() => EffectsRegistry) = () => {
   }
 }
 
-type Accessor<T> = () => T
-type Setter<T> = (v: T) => void
-export type Signal<T> = [Accessor<T>, Setter<T>]
 export function signal<T>(initial: T): Signal<T> {
   const { register, runAll } = createEffectsRegistry()
   var state: T = initial
@@ -37,7 +35,6 @@ export function signal<T>(initial: T): Signal<T> {
   return [accessor, setter]
 }
 
-export type Effect<T> = {run: () => T}
 let runningEffect: Effect<any> | null = null
 let previousObserver: Effect<any> | null = null
 

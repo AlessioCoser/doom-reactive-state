@@ -1,4 +1,5 @@
-import { effect, Signal, signal } from './engine'
+import { effect, signal } from './engine'
+import { Signal } from './types'
 
 type Root = (child: () => HTMLElement) => void
 const root: Root = (child) => {

@@ -1,52 +1,13 @@
-import { effect, signal, Signal } from './engine'
-
-type Root = (child: () => HTMLElement) => void
-const root: Root = (child) => {
-  document.body.appendChild(child())
-}
-
-type Prop<T> = T | (() => T)
-type PropEvent = (ev: MouseEvent) => Promise<void> | void
-
-type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
-const Button = (props: ButtonProps) => {
-  const el = document.createElement("button") as HTMLButtonElement
-  effect(() => {
-    el.innerText = evaluate(props.text)
-    el.disabled = evaluate(props.disabled)
-    el.onclick = props.onclick
-  })
-  return el
-}
-
-type H2Props = { text: Prop<string> }
-const H2 = (props: H2Props) => {
-  const el = document.createElement("h2")
-  effect(() => el.innerText = evaluate(props.text))
-  return el
-}
-
-type DivProps = { children: HTMLElement[] }
-const Div = (props: DivProps) => {
-  const el = document.createElement("div")
-  effect(() => props.children.forEach(child => el.appendChild(child)))
-  return el
-}
-
-function evaluate<T>(prop: Prop<T>): T {
-  if(typeof prop === 'function'){
-    return (prop as Function)()
-  }
-  return prop
-}
+import { effect, signal, Signal } from '../src/engine'
+import { Button, Div, H2, root } from '../src/dom'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
-  // this is a non-reactive component it's out of therenderer loop since it isn't wrapped with the reactive function
-  // here we can instantiate the state (!! never instantiate a state in a reactive component !!)
+  // this is a non-reactive component it's out of the renderer loop since it isn't wrapped with the `effect` function
+  // here we can instantiate the state (!! never instantiate a state in an `effect` function !!)
+  const [count, setCount] = counter
   const [btnText, setBtnText] = signal('initial text')
   const [isLoading, setIsLoading] = signal(false)
-  const [count, setCount] = counter
 
   // we can use setTimeout and setInterval outside re-rendered components
   setTimeout(() => setBtnText('updated text'), 2000)

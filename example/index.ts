@@ -1,6 +1,6 @@
-import { Component, effect, Signal, signal } from './engine'
+import { effect, Signal, signal } from './engine'
 
-type Root = (child: Component<HTMLElement>) => void
+type Root = (child: () => HTMLElement) => void
 const root: Root = (child) => {
   document.body.appendChild(child())
 }

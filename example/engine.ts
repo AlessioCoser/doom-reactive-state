@@ -1,6 +1,3 @@
-export type Accessor<T> = () => T
-export type Setter<T> = (v: T) => void
-
 type EffectsRegistry = { runAll: () => void, register: (effect: Effect<any> | null) => void}
 const createEffectsRegistry: (() => EffectsRegistry) = () => {
   const registeredEffects: Effect<any>[] = []
@@ -20,6 +17,8 @@ const createEffectsRegistry: (() => EffectsRegistry) = () => {
   }
 }
 
+type Accessor<T> = () => T
+type Setter<T> = (v: T) => void
 export type Signal<T> = [Accessor<T>, Setter<T>]
 export function signal<T>(initial: T): Signal<T> {
   const { register, runAll } = createEffectsRegistry()
@@ -38,12 +37,11 @@ export function signal<T>(initial: T): Signal<T> {
   return [accessor, setter]
 }
 
-export type Component<T> = () => T
-export type Effect<T> = {run: Component<T>}
+export type Effect<T> = {run: () => T}
 let runningEffect: Effect<any> | null = null
 let previousObserver: Effect<any> | null = null
 
-export function createEffect<T>(component: Component<T>): Effect<T> {
+export function createEffect<T>(component: () => T): Effect<T> {
   return {
     run() {
       previousObserver = runningEffect
@@ -55,7 +53,7 @@ export function createEffect<T>(component: Component<T>): Effect<T> {
   }
 }
 
-export function effect<T>(component: Component<T>): T {
+export function effect<T>(component: () => T): T {
   const s = createEffect(component)
   return s.run()
 }

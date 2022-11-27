@@ -1,6 +1,6 @@
 import { Accessor, Effect, EffectsRegistry, Setter, Signal } from './types'
 
-const createEffectsRegistry: (() => EffectsRegistry) = () => {
+const createEffectsRegistry = () => {
   const registeredEffects: Effect<any>[] = []
 
   const notYetRegistered = (effect: Effect<any> | null): boolean => {
@@ -18,39 +18,32 @@ const createEffectsRegistry: (() => EffectsRegistry) = () => {
   }
 }
 
+let runningEffect: Effect<any> | null = null
+export function effect<T>(component: () => T): T {
+  const s = {
+    run() {
+      runningEffect = this;
+      const result = component()
+      runningEffect = null
+      return result
+    }
+  }
+  return s.run()
+}
+
 export function signal<T>(initial: T): Signal<T> {
-  const { register, runAll } = createEffectsRegistry()
+  const registry: EffectsRegistry = createEffectsRegistry()
   var state: T = initial
 
   const accessor: Accessor<T> = () => {
-    register(runningEffect)
+    registry.register(runningEffect)
     return state
   }
 
   const setter: Setter<T> = (newState: T): void => {
     state = newState
-    runAll()
+    registry.runAll()
   }
 
   return [accessor, setter]
-}
-
-let runningEffect: Effect<any> | null = null
-let previousObserver: Effect<any> | null = null
-
-export function createEffect<T>(component: () => T): Effect<T> {
-  return {
-    run() {
-      previousObserver = runningEffect
-      runningEffect = this;
-      const result = component()
-      runningEffect = previousObserver
-      return result
-    }
-  }
-}
-
-export function effect<T>(component: () => T): T {
-  const s = createEffect(component)
-  return s.run()
 }

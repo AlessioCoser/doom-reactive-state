@@ -1,34 +1,44 @@
 export type Accessor<T> = () => T
 export type Setter<T> = (v: T) => void
 
-export function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
+type EffectsRegistry = { runAll: () => void, register: (effect: Effect<any> | null) => void}
+const createEffectsRegistry: (() => EffectsRegistry) = () => {
   const registeredEffects: Effect<any>[] = []
 
-  const toRegister = (effect: Effect<any> | null) => {
+  const notYetRegistered = (effect: Effect<any> | null): boolean => {
     if (!effect) return false
     return !registeredEffects.some(registered => registered === effect)
   }
 
-  return (function () {
-    var state: T = initial
-    const accessor: Accessor<T> = function accessor() {
-      if(toRegister(runningEffect)) {
-        registeredEffects.push(runningEffect)
+  return {
+    runAll: () => registeredEffects.forEach(registered => registered.run()),
+    register: (effect: Effect<any> | null): void => {
+      if(notYetRegistered(effect)) {
+        registeredEffects.push(effect)
       }
-      return state
     }
-
-    const setter: Setter<T> = function setter(newState: T): void {
-      state = newState
-      registeredEffects.forEach(registered => registered.run())
-    }
-
-    return [accessor, setter]
-  })()
+  }
 }
 
-export type Component<T> = (...x: any) => T
+export type Signal<T> = [Accessor<T>, Setter<T>]
+export function signal<T>(initial: T): Signal<T> {
+  const { register, runAll } = createEffectsRegistry()
+  var state: T = initial
 
+  const accessor: Accessor<T> = () => {
+    register(runningEffect)
+    return state
+  }
+
+  const setter: Setter<T> = (newState: T): void => {
+    state = newState
+    runAll()
+  }
+
+  return [accessor, setter]
+}
+
+export type Component<T> = () => T
 export type Effect<T> = {run: Component<T>}
 let runningEffect: Effect<any> | null = null
 let previousObserver: Effect<any> | null = null

@@ -1,16 +1,16 @@
-import { Component, effect, useState } from './engine'
+import { Component, effect, Signal, signal } from './engine'
 
 type Root = (child: Component<HTMLElement>) => void
 const root: Root = (child) => {
   document.body.appendChild(child())
 }
 
-type Prop<T> = () => T | T
+type Prop<T> = (() => T) | T
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
 // We must pass a NON ARROW function as argument of reactive function
-const Button: Component<HTMLElement> = (props: ButtonProps) => {
+const Button = (props: ButtonProps) => {
   const el = document.createElement("button") as HTMLButtonElement
   effect(function () {
     el.innerText = evaluate(props.text)
@@ -22,7 +22,7 @@ const Button: Component<HTMLElement> = (props: ButtonProps) => {
 
 type H2Props = { text: Prop<string> }
 // We must pass a NON ARROW function as argument of reactive function
-const H2: Component<HTMLElement> = (props: H2Props) => {
+const H2 = (props: H2Props) => {
   const el = document.createElement("h2")
   effect(() => el.innerText = evaluate(props.text))
   return el
@@ -30,7 +30,7 @@ const H2: Component<HTMLElement> = (props: H2Props) => {
 
 type DivProps = { children: HTMLElement[] }
 // We must pass a NON ARROW function as argument of reactive function
-const Div: Component<HTMLElement> = (props: DivProps) => {
+const Div = (props: DivProps) => {
   const el = document.createElement("div")
   effect(function () {
     props.children.forEach(child => el.appendChild(child))
@@ -45,11 +45,12 @@ function evaluate<T>(prop: Prop<T>): T {
   return prop
 }
 
-const Main: Component<HTMLElement> = ({counter}) => {
+type MainProps = { counter: Signal<number> }
+const Main = ({ counter }: MainProps) => {
   // this is a non-reactive component it's out of therenderer loop since it isn't wrapped with the reactive function
   // here we can instantiate the state (!! never instantiate a state in a reactive component !!)
-  const [btnText, setBtnText] = useState('initial text')
-  const [isLoading, setIsLoading] = useState(false)
+  const [btnText, setBtnText] = signal('initial text')
+  const [isLoading, setIsLoading] = signal(false)
   const [count, setCount] = counter
 
   // we can use setTimeout and setInterval outside re-rendered components
@@ -82,7 +83,7 @@ const Main: Component<HTMLElement> = ({counter}) => {
 const App = () => {
   // you can pass the state through all the components,
   // but will be re-rendered only the components that really access it
-  const counter = useState(0)
+  const counter = signal(0)
   return Main({ counter })
 }
 

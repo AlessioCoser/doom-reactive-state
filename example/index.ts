@@ -1,5 +1,4 @@
-import { effect, signal } from './engine'
-import { Signal } from './types'
+import { effect, signal, Signal } from './engine'
 
 type Root = (child: () => HTMLElement) => void
 const root: Root = (child) => {
@@ -10,10 +9,9 @@ type Prop<T> = T | (() => T)
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
-// We must pass a NON ARROW function as argument of reactive function
 const Button = (props: ButtonProps) => {
   const el = document.createElement("button") as HTMLButtonElement
-  effect(function () {
+  effect(() => {
     el.innerText = evaluate(props.text)
     el.disabled = evaluate(props.disabled)
     el.onclick = props.onclick
@@ -22,7 +20,6 @@ const Button = (props: ButtonProps) => {
 }
 
 type H2Props = { text: Prop<string> }
-// We must pass a NON ARROW function as argument of reactive function
 const H2 = (props: H2Props) => {
   const el = document.createElement("h2")
   effect(() => el.innerText = evaluate(props.text))
@@ -30,12 +27,9 @@ const H2 = (props: H2Props) => {
 }
 
 type DivProps = { children: HTMLElement[] }
-// We must pass a NON ARROW function as argument of reactive function
 const Div = (props: DivProps) => {
   const el = document.createElement("div")
-  effect(function () {
-    props.children.forEach(child => el.appendChild(child))
-  })
+  effect(() => props.children.forEach(child => el.appendChild(child)))
   return el
 }
 

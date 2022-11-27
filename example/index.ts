@@ -57,6 +57,10 @@ const Main = ({ counter }: MainProps) => {
   setTimeout(() => setBtnText('updated text'), 2000)
   setTimeout(() => setCount(count() + 1), 5000)
 
+  effect(() => console.log('count effect', count()))
+  effect(() => console.log('loading effect', isLoading()))
+  effect(() => console.log('text effect', btnText()))
+
   const asyncOperation = async () => {
     return new Promise((resolve) => {
       setTimeout(() => resolve(null), 1000)

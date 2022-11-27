@@ -2,9 +2,9 @@ export type Accessor<T> = () => T
 export type Setter<T> = (v: T) => void
 
 export function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
-  const registeredEffects: Effect[] = []
+  const registeredEffects: Effect<any>[] = []
 
-  const toRegister = (effect: Effect | null) => {
+  const toRegister = (effect: Effect<any> | null) => {
     if (!effect) return false
     return !registeredEffects.some(registered => registered === effect)
   }
@@ -27,13 +27,13 @@ export function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
   })()
 }
 
-export type Component = (...x: any) => HTMLElement
+export type Component<T> = (...x: any) => T
 
-export type Effect = {run: Component}
-let runningEffect: Effect | null = null
-let previousObserver: Effect | null = null
+export type Effect<T> = {run: Component<T>}
+let runningEffect: Effect<any> | null = null
+let previousObserver: Effect<any> | null = null
 
-export function createEffect(component: Component): Effect {
+export function createEffect<T>(component: Component<T>): Effect<T> {
   return {
     run() {
       previousObserver = runningEffect
@@ -45,12 +45,7 @@ export function createEffect(component: Component): Effect {
   }
 }
 
-export function effect(component: Component): HTMLElement {
+export function effect<T>(component: Component<T>): T {
   const s = createEffect(component)
   return s.run()
-}
-
-export type Root = (child: Component) => void
-export const root: Root = (child) => {
-  document.body.appendChild(child())
 }

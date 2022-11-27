@@ -1,11 +1,16 @@
-import { Component, effect, root, useState } from './engine'
+import { Component, effect, useState } from './engine'
+
+type Root = (child: Component<HTMLElement>) => void
+const root: Root = (child) => {
+  document.body.appendChild(child())
+}
 
 type Prop<T> = () => T | T
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
 // We must pass a NON ARROW function as argument of reactive function
-const Button: Component = (props: ButtonProps) => {
+const Button: Component<HTMLElement> = (props: ButtonProps) => {
   const el = document.createElement("button") as HTMLButtonElement
   effect(function () {
     el.innerText = evaluate(props.text)
@@ -17,7 +22,7 @@ const Button: Component = (props: ButtonProps) => {
 
 type H2Props = { text: Prop<string> }
 // We must pass a NON ARROW function as argument of reactive function
-const H2: Component = (props: H2Props) => {
+const H2: Component<HTMLElement> = (props: H2Props) => {
   const el = document.createElement("h2")
   effect(() => el.innerText = evaluate(props.text))
   return el
@@ -25,7 +30,7 @@ const H2: Component = (props: H2Props) => {
 
 type DivProps = { children: HTMLElement[] }
 // We must pass a NON ARROW function as argument of reactive function
-const Div: Component = (props: DivProps) => {
+const Div: Component<HTMLElement> = (props: DivProps) => {
   const el = document.createElement("div")
   effect(function () {
     props.children.forEach(child => el.appendChild(child))
@@ -40,7 +45,7 @@ function evaluate<T>(prop: Prop<T>): T {
   return prop
 }
 
-const Main: Component = ({counter}) => {
+const Main: Component<HTMLElement> = ({counter}) => {
   // this is a non-reactive component it's out of therenderer loop since it isn't wrapped with the reactive function
   // here we can instantiate the state (!! never instantiate a state in a reactive component !!)
   const [btnText, setBtnText] = useState('initial text')

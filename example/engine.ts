@@ -2,32 +2,26 @@ export type Accessor<T> = () => T
 export type Setter<T> = (v: T) => void
 
 export function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
-  const observers: Observer[] = []
+  const registeredEffects: Effect[] = []
 
-  const toBeObserved = (observer: Observer) => {
-    if (!observer.id) return false
-    return !observers.some(obs => obs.id === observer.id)
+  const toRegister = (effect: Effect | null) => {
+    if (!effect) return false
+    if (!effect.id) return false
+    return !registeredEffects.some(registered => registered.id === effect.id)
   }
 
   return (function () {
     var state: T = initial
     const accessor: Accessor<T> = function accessor() {
-      if(currentObserver && toBeObserved(currentObserver)) {
-        observers.push(currentObserver)
+      if(toRegister(runningEffect)) {
+        registeredEffects.push(runningEffect)
       }
       return state
     }
 
     const setter: Setter<T> = function setter(newState: T): void {
       state = newState
-      if (!currentObserver) {
-        observers.forEach(obs => obs.component())
-        return
-      }
-
-      observers
-        .filter(obs => obs.id !== currentObserver?.id)
-        .forEach(obs => currentObserver?.deferred?.push(obs.component))
+      registeredEffects.forEach(registered => registered.run())
     }
 
     return [accessor, setter]
@@ -36,33 +30,29 @@ export function useState<T>(initial: T): [Accessor<T>, Setter<T>] {
 
 export type Component = (...x: any) => HTMLElement
 
-export type Observer = {id: string, component: Component, deferred: (() => void)[]}
-let currentObserver: Observer | null = null
-let previousObserver: Observer | null = null
+export type Effect = {id: string, run: Component}
+let runningEffect: Effect | null = null
+let previousObserver: Effect | null = null
 
-export function createObserver(id: string, component: Component): Observer {
+export function createEffect(id: string, component: Component): Effect {
   return {
     id,
-    deferred: [],
-    component() {
-      this.deferred = []
-      previousObserver = currentObserver
-      currentObserver = this;
-      const result = component.bind({id})()
-      const deferred = currentObserver.deferred
-      currentObserver = previousObserver
-      deferred.forEach(fn => fn())
+    run() {
+      previousObserver = runningEffect
+      runningEffect = this;
+      const result = component()
+      runningEffect = previousObserver
       return result
     }
   }
 }
 
-export const reactive: Component = (function reactive() {
-  let reactiveIndex: number = 1
-  return function reactive(component: Component): HTMLElement {
-    const id = reactiveIndex++
-    const s = createObserver(id.toString(), component)
-    return s.component()
+export const effect: Component = (function effect() {
+  let effectId: number = 1
+  return function effect(component: Component): HTMLElement {
+    const id = effectId++
+    const s = createEffect(id.toString(), component)
+    return s.run()
   }
 })()
 

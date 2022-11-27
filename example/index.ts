@@ -1,49 +1,43 @@
-import { Component, reactive, root, useState } from './engine'
+import { Component, effect, root, useState } from './engine'
 
 type Prop<T> = () => T | T
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
 // We must pass a NON ARROW function as argument of reactive function
-const Button: Component = (props: ButtonProps) => reactive(function () {
-  const el = getOrCreate(this.id, "button") as HTMLButtonElement
-  el.innerText = evaluate(props.text)
-  el.disabled=evaluate(props.disabled)
-  el.onclick = props.onclick
+const Button: Component = (props: ButtonProps) => {
+  const el = document.createElement("button") as HTMLButtonElement
+  effect(function () {
+    el.innerText = evaluate(props.text)
+    el.disabled = evaluate(props.disabled)
+    el.onclick = props.onclick
+  })
   return el
-})
+}
 
 type H2Props = { text: Prop<string> }
 // We must pass a NON ARROW function as argument of reactive function
-const H2: Component = (props: H2Props) => reactive(function () {
-  const el = getOrCreate(this.id, "h2")
-  el.innerText = evaluate(props.text)
+const H2: Component = (props: H2Props) => {
+  const el = document.createElement("h2")
+  effect(() => el.innerText = evaluate(props.text))
   return el
-})
+}
 
 type DivProps = { children: HTMLElement[] }
 // We must pass a NON ARROW function as argument of reactive function
-const Div: Component = (props: DivProps) => reactive(function () {
-  const el = getOrCreate(this.id, "div")
-  props.children.forEach(child => el.appendChild(child))
+const Div: Component = (props: DivProps) => {
+  const el = document.createElement("div")
+  effect(function () {
+    props.children.forEach(child => el.appendChild(child))
+  })
   return el
-})
+}
 
 function evaluate<T>(prop: Prop<T>): T {
   if(typeof prop === 'function'){
     return prop()
   }
   return prop
-}
-
-function createElement(id: string, tag: string): HTMLElement {
-  const element = document.createElement(tag)
-  element.setAttribute('_id', id)
-  return element
-}
-
-function getOrCreate(id: string, tag: string): HTMLElement {
-  return document.querySelector(`[_id="${id}"]`) || createElement(id, tag)
 }
 
 const Main: Component = ({counter}) => {

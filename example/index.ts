@@ -5,7 +5,7 @@ const root: Root = (child) => {
   document.body.appendChild(child())
 }
 
-type Prop<T> = (() => T) | T
+type Prop<T> = T | (() => T)
 type PropEvent = (ev: MouseEvent) => Promise<void> | void
 
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
@@ -40,7 +40,7 @@ const Div = (props: DivProps) => {
 
 function evaluate<T>(prop: Prop<T>): T {
   if(typeof prop === 'function'){
-    return prop()
+    return (prop as Function)()
   }
   return prop
 }

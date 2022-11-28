@@ -11,11 +11,9 @@ export const root: Root = (child, rootElement = document.body) => {
 type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
 export const Button = (props: ButtonProps) => {
   const el = document.createElement("button") as HTMLButtonElement
-  effect(() => {
-    el.innerText = evaluate(props.text)
-    el.disabled = evaluate(props.disabled)
-    el.onclick = props.onclick
-  })
+  el.onclick = props.onclick
+  effect(() => el.innerText = evaluate(props.text))
+  effect(() => el.disabled = evaluate(props.disabled))
   return el
 }
 

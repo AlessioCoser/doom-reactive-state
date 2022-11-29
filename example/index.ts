@@ -1,5 +1,5 @@
 import { effect, signal, Signal } from '../src/engine'
-import { Button, Div, H2, root } from '../src/dom'
+import { Button, Div, H2, P, root } from '../src/dom'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -8,11 +8,13 @@ const Main = ({ counter }: MainProps) => {
   const [count, setCount] = counter
   const [btnText, setBtnText] = signal('initial text')
   const [isLoading, setIsLoading] = signal(false)
+  const [countList, setCountList] = signal<number[]>([])
 
   // we can use setTimeout and setInterval outside re-rendered components
   setTimeout(() => setBtnText('updated text'), 2000)
   setTimeout(() => setCount(count() + 1), 5000)
 
+  effect(() => setCountList([count(), ...countList()]))
   effect(() => console.log('count effect', count()))
   effect(() => console.log('loading effect', isLoading()))
   effect(() => console.log('text effect', btnText()))
@@ -30,13 +32,15 @@ const Main = ({ counter }: MainProps) => {
     setIsLoading(false)
   }
 
-  return Div({ children: [
+  return Div({ children: () => [
     // only functions inside objects are binded
     // all computed properties must be functions
     H2({ text: () => `count ${count()}` }),
     // you can avoid the element reacting for a specific property: see text property, we pass it directly without any function
     // but since the state accessor is a function you can pass it directly and still react to it's change
-    Button({ text: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick })
+    Button({ text: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick }),
+
+    Div({ children: () => countList().map((it) => P({ text: `count: ${it}`}))})
   ]})
 }
 

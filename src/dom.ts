@@ -24,10 +24,20 @@ export const H2 = (props: H2Props) => {
   return el
 }
 
-type DivProps = { children: HTMLElement[] }
+type PProps = { text: Prop<string> }
+export const P = (props: PProps) => {
+  const el = document.createElement("p")
+  effect(() => el.innerText = evaluate(props.text))
+  return el
+}
+
+type DivProps = { children: Prop<HTMLElement[]> }
 export const Div = (props: DivProps) => {
   const el = document.createElement("div")
-  effect(() => props.children.forEach(child => el.appendChild(child)))
+  effect(() => {
+    el.innerHTML = '';
+    evaluate(props.children).forEach((child) => el.appendChild(child))
+  })
   return el
 }
 

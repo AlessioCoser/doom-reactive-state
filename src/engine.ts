@@ -1,10 +1,10 @@
-type EffectsRegistry = { runAll: () => void, register: (effect: Effect<any> | null) => void}
+type EffectsRegistry = { runAll: (effect?: Effect<any> | null) => void, register: (effect: Effect<any> | null) => void}
 const createEffectsRegistry = () => {
   const registeredEffects: Effect<any>[] = []
   const notYetRegistered = (e: Effect<any>) => !registeredEffects.some(r => r === e)
 
   return {
-    runAll: () => registeredEffects.forEach(registered => registered.run()),
+    runAll: (exclude: Effect<any> | null = null) => registeredEffects.filter(r => r !== exclude).forEach(r => r.run()),
     register: (effect: Effect<any> | null): void => {
       if(effect && notYetRegistered(effect)) {
         registeredEffects.push(effect)
@@ -39,7 +39,7 @@ export function signal<T>(initial: T): Signal<T> {
     },
     function setter (newState: T): void {
       state = newState
-      registry.runAll()
+      registry.runAll(runningEffect)
     }
   ]
 }

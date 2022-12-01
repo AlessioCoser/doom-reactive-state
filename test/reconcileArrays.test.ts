@@ -4,7 +4,38 @@ const { document } = (new JSDOM(`<!DOCTYPE html><html><head></head><body></body>
 
 const body = document.body
 
-const p = (id: number): HTMLElement => {
+describe("reconcile arrays", () => {
+  beforeEach(() => {
+    body.innerHTML = ''
+  })
+
+  it.each([
+      ["no changes", [ p(1) ], [ p(1) ]],
+      ["append from empty", [  ], [ p(1) ]],
+      ["append element", [ p(1) ], [ p(1), p(2) ]],
+      ["append multiple element", [ p(1) ], [ p(1), p(2), p(3) ]],
+      ["prepend element", [ p(1) ], [ p(2), p(1) ]],
+      ["prepend multiple element", [ p(1) ], [ p(3), p(2), p(1) ]],
+      ["prepend middle element", [ p(1), p(2) ], [ p(1), p(3), p(2) ]],
+      ["remove child", [ p(1) ], [  ]],
+      ["remove multiple children (equals at the start)", [ p(1), p(1.5), p(2) ], [ p(1) ]],
+      ["remove multiple children (equals at the end)", [ p(1), p(1.5), p(2) ], [ p(2) ]],
+      ["remove multiple child (equals in the middle)", [ p(1), p(2), p(3) ], [ p(2) ]],
+      ["swap first and last nodes", [ p(1), p(2) ], [ p(2), p(1) ]],
+      ["swap first and last nodes with 2 in the middle", [ p(1), p(2), p(3), p(4) ], [ p(4), p(2), p(3), p(1) ]],
+      ["replace child", [ p(1), p(2) ], [ p(1), p(3) ]],
+      ["duplicated nodes", [ p(1), p(2), p(3), p(2) ], [ p(2), p(1), p(2), p(3) ]],
+      ["complete example", [ p(1), p(2), p(3), p(4), p(5) ], [ p(2), p(5), p(1), p(6) ]],
+  ])('%p', (_: string, _asIs: Element[], toBe: Element[]) => {
+    const asIs = childrenOf(body, _asIs)
+
+    reconcileArrays(body, asIs, toBe)
+
+    expect(Array.from(body.children)).toEqual(toBe)
+  });
+})
+
+function p(id: number): HTMLElement {
   const el = document.createElement('p')
   el.setAttribute("_key", id.toString())
   return el
@@ -14,145 +45,3 @@ function childrenOf(parent: Element, children: Element[]): Element[] {
   children.forEach(child => parent.appendChild(child))
   return Array.from(parent.children)
 }
-
-
-describe("reconcile arrays", () => {
-  beforeEach(() => {
-    body.innerHTML = ''
-  })
-
-  test("no changes", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe = [p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("append from empty", () =>  {
-    const asIs = childrenOf(body, [])
-    const toBe = [p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("append element", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe = [p(1), p(2)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("append multiple element", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe = [p(1), p(2), p(3)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("prepend element", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe = [p(2), p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("prepend multiple element", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe = [p(3), p(2), p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("prepend middle element", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2)])
-    const toBe = [p(1), p(3), p(2)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("remove child", () =>  {
-    const asIs = childrenOf(body, [p(1)])
-    const toBe: HTMLElement[] = []
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("remove multiple child (equals at the end)", () =>  {
-    const asIs = childrenOf(body, [p(1), p(1.5), p(2)])
-    const toBe = [p(2)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("remove multiple child (equals in the middle)", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2), p(3)])
-    const toBe = [p(2)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("swap first and last nodes", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2)])
-    const toBe = [p(2), p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("swap first and last nodes with something in the middle", () =>  {
-    const asIs = childrenOf(body, [p(1), p(1.7), p(1.3), p(2)])
-    const toBe = [p(2), p(1.7), p(1.3), p(1)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("replace child", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2)])
-    const toBe = [p(1), p(3)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("complete example", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2), p(3), p(4), p(5)])
-    const toBe = [p(2), p(5), p(1), p(6)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-
-  test("duplicated nodes", () =>  {
-    const asIs = childrenOf(body, [p(1), p(2), p(3), p(2)])
-    const toBe = [p(2), p(1), p(2), p(3)]
-
-    reconcileArrays(body, asIs, toBe)
-
-    expect(Array.from(body.children)).toEqual(toBe)
-  })
-})

@@ -37,7 +37,7 @@ describe("reconcile arrays", () => {
 
 function p(id: number): HTMLElement {
   const el = document.createElement('p')
-  el.setAttribute("_key", id.toString())
+  el.innerHTML = id.toString()
   return el
 }
 

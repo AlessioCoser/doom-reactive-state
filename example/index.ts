@@ -39,7 +39,7 @@ const Main = ({ counter }: MainProps) => {
     // you can avoid the element reacting for a specific property: see text property, we pass it directly without any function
     // but since the state accessor is a function you can pass it directly and still react to it's change
     Button({ text: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick }),
-    For(history, it => P({ key: `${it}`, text: `${it}` }))
+    For(history, it => P({ text: `${it}` }))
   ]})
 }
 

@@ -25,10 +25,9 @@ export const H2 = (props: H2Props) => {
   return el
 }
 
-type PProps = { key?: string, text: Prop<string> }
+type PProps = { text: Prop<string> }
 export const P = (props: PProps) => {
   const el = document.createElement("p")
-  if (props.key !== undefined) el.setAttribute("_key", props.key)
   effect(() => el.innerText = evaluate(props.text))
   return el
 }

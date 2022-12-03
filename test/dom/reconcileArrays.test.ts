@@ -1,4 +1,4 @@
-import { reconcileArrays } from '../src/reconcileArrays'
+import { reconcileArrays } from '../../src/dom/reconcileArrays'
 import { JSDOM } from 'jsdom'
 const { document } = (new JSDOM(`<!DOCTYPE html><html><head></head><body></body></html>`)).window;
 

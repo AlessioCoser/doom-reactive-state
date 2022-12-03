@@ -1,4 +1,4 @@
-import { effect } from "./engine"
+import { effect } from "./reactivity"
 import { reconcileArrays } from "./reconcileArrays"
 
 type Prop<T> = T | (() => T)

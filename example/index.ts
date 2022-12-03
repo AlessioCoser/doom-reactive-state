@@ -1,4 +1,4 @@
-import { effect, signal, Signal } from '../src/engine'
+import { effect, signal, Signal } from '../src/reactivity'
 import { Button, Div, H2, P, For, root } from '../src/dom'
 
 type MainProps = { counter: Signal<number> }

@@ -32,7 +32,7 @@ const Main = ({ counter }: MainProps) => {
     setIsLoading(false)
   }
 
-  return Div({ children: [
+  return Div({ children: () => [
     // only functions inside objects are binded
     // all computed properties must be functions
     H2({ text: () => `count ${count()}` }),

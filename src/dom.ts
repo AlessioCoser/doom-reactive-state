@@ -32,19 +32,15 @@ export const P = (props: PProps) => {
   return el
 }
 
-type DivProps = { children: HTMLElement[] }
+type DivProps = { children: Prop<HTMLElement[]> }
 export const Div = (props: DivProps) => {
   const el = document.createElement("div")
-  props.children.forEach(child => el.appendChild(child))
+  effect(() => reconcileArrays(el, Array.from(el.children), evaluate(props.children)))
   return el
 }
 
 export const For = <T>(children: Prop<T[]>, map: (child: T) => HTMLElement) => {
-  const el = document.createElement("div")
-  effect(() => {
-    reconcileArrays(el, Array.from(el.children), evaluate(children).map(map))
-  })
-  return el
+  return Div({ children: () => evaluate(children).map(map) })
 }
 
 function evaluate<T>(prop: Prop<T>): T {

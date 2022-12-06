@@ -32,7 +32,7 @@ const Main = ({ counter }: MainProps) => {
     setIsLoading(false)
   }
 
-  return h("div", {}, [
+  return h("div", [
     // only functions inside objects are binded
     // all computed properties must be functions
     h("h2", { innerText: () => `count ${count()}` }),

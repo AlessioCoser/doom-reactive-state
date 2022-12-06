@@ -1,49 +1,44 @@
 import { effect } from "../reactivity"
 import { reconcileArrays } from "./reconcileArrays"
 
-type Prop<T> = T | (() => T)
-type PropEvent = (ev: MouseEvent) => Promise<void> | void
-
-type Root = (child: () => HTMLElement, rootElement?: HTMLElement) => void
-export const root: Root = (child, rootElement = document.body) => {
-  rootElement.appendChild(child())
+type Children = Property<HTMLElement[]>
+type Property<T> = T | (() => T)
+type Properties<T extends keyof HTMLElementTagNameMap> = {
+  [K in keyof HTMLElementTagNameMap[T] as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Property<HTMLElementTagNameMap[T][K]>
 }
 
-type ButtonProps = { text: Prop<string>, disabled: Prop<boolean>, onclick: PropEvent }
-export const Button = (props: ButtonProps) => {
-  const el = document.createElement("button") as HTMLButtonElement
-  el.onclick = props.onclick
-  effect(() => el.innerText = evaluate(props.text))
-  effect(() => el.disabled = evaluate(props.disabled))
+export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Children = []): HTMLElementTagNameMap[K] {
+  const el = document.createElement(tag)
+  foreachProperty(properties, ({prop, value}) => {
+    if ((prop as String).startsWith('on')) {
+      el[prop] = pass(value)
+    } else {
+      effect(() => el[prop] = evaluate(value))
+    }
+  })
+  effect(() => reconcileArrays(el, Array.from(el.children), evaluate(children)))
   return el
 }
 
-type H2Props = { text: Prop<string> }
-export const H2 = (props: H2Props) => {
-  const el = document.createElement("h2")
-  effect(() => el.innerText = evaluate(props.text))
-  return el
+type PropKeyVal<K extends keyof HTMLElementTagNameMap> = {
+  prop: keyof HTMLElementTagNameMap[K],
+  value: Property<HTMLElementTagNameMap[K][keyof HTMLElementTagNameMap[K]]>
+}
+function foreachProperty<K extends keyof HTMLElementTagNameMap>(
+  properties: Properties<K>,
+  callback: (x: PropKeyVal<K>) => void
+) {
+  Object.entries(properties).forEach(([prop, value]) => callback({
+    prop: prop as keyof HTMLElementTagNameMap[K],
+    value: value as Property<HTMLElementTagNameMap[K][keyof HTMLElementTagNameMap[K]]>
+  }))
 }
 
-type PProps = { text: Prop<string> }
-export const P = (props: PProps) => {
-  const el = document.createElement("p")
-  effect(() => el.innerText = evaluate(props.text))
-  return el
+function pass<T>(prop: Property<T>): T {
+  return prop as T
 }
 
-type DivProps = { children: Prop<HTMLElement[]> }
-export const Div = (props: DivProps) => {
-  const el = document.createElement("div")
-  effect(() => reconcileArrays(el, Array.from(el.children), evaluate(props.children)))
-  return el
-}
-
-export const For = <T>(children: Prop<T[]>, map: (child: T) => HTMLElement) => {
-  return Div({ children: () => evaluate(children).map(map) })
-}
-
-function evaluate<T>(prop: Prop<T>): T {
+function evaluate<T>(prop: Property<T>): T {
   if(typeof prop === 'function'){
     return (prop as Function)()
   }

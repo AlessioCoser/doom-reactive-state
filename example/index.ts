@@ -1,5 +1,5 @@
 import { effect, signal, Signal } from '../src/reactivity'
-import { Button, Div, H2, P, For, root } from '../src/dom'
+import { h } from '../src/dom'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -32,15 +32,15 @@ const Main = ({ counter }: MainProps) => {
     setIsLoading(false)
   }
 
-  return Div({ children: () => [
+  return h("div", {}, [
     // only functions inside objects are binded
     // all computed properties must be functions
-    H2({ text: () => `count ${count()}` }),
+    h("h2", { innerText: () => `count ${count()}` }),
     // you can avoid the element reacting for a specific property: see text property, we pass it directly without any function
     // but since the state accessor is a function you can pass it directly and still react to it's change
-    Button({ text: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick }),
-    For(history, it => P({ text: `${it}` }))
-  ]})
+    h("button", { innerText: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick }),
+    h("div", {}, () => history().map((it) => h("p", { innerText: `${it}` })))
+  ])
 }
 
 const App = () => {
@@ -50,4 +50,4 @@ const App = () => {
   return Main({ counter })
 }
 
-root(App)
+document.body.appendChild(App())

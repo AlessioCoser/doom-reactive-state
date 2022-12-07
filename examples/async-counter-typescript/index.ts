@@ -35,7 +35,7 @@ const Main = ({ counter }: MainProps) => {
     // only functions inside objects are binded
     // all computed properties must be functions
     h("h2", { innerText: () => `count ${count()}` }),
-    // you can avoid the element reacting for a specific property: see text property, we pass it directly without any function
+    // you can avoid the element reacting for a specific property: see innerText property, we pass it directly without any function
     // but since the state accessor is a function you can pass it directly and still react to it's change
     h("button", { innerText: `button ${btnText()}`, disabled: isLoading, onclick: onButtonClick }),
     h("div", {}, () => history().map((it) => h("p", { innerText: `${it}` })))

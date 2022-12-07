@@ -15,3 +15,8 @@ npm run build
 ```
 npm test
 ```
+
+## Create a new release
+```
+npm run release <version>
+```

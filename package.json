@@ -1,17 +1,10 @@
 {
   "name": "doom-reactive-js",
-  "type": "module",
-  "version": "0.0.5",
-  "description": "",
-  "main": "dist/index.js",
-  "types": "dist/types.d.ts",
   "scripts": {
     "build": "tsc",
     "example": "parcel example/index.html --dist-dir example/dist",
+    "release": "npm run build && ./publishing/publish.sh $1",
     "test": "jest"
-  },
-  "exports": {
-    ".": "./dist"
   },
   "jest": {
     "preset": "ts-jest"

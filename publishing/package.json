@@ -1,0 +1,10 @@
+{
+  "name": "doom-reactive-js",
+  "type": "module",
+  "version": "%VERSION%",
+  "description": "",
+  "main": "index.js",
+  "types": "types.d.ts",
+  "author": "Alessio Coser",
+  "license": "MIT"
+}

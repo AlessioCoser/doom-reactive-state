@@ -3,13 +3,15 @@
     "target": "es6",
     "lib": ["es2017", "dom"],
     "types": ["jest"],
+    "module": "commonjs",
+    "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "allowJs": false,
+    "strict": true,
     "sourceMap": true,
-    "moduleResolution": "node",
     "outDir": "./dist"
   },
   "include": ["./src"]

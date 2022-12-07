@@ -31,8 +31,8 @@ function foreachProperty<K extends keyof HTMLElementTagNameMap>(
   }))
 }
 
-const isProps = (value: unknown): boolean => value && typeof value === 'object' && !Array.isArray(value) && typeof value !== 'function'
-const isChildren = (value: unknown): boolean => value && (Array.isArray(value) || typeof value === 'function')
+const isProps = (value: unknown): boolean => !!value && typeof value === 'object' && !Array.isArray(value) && typeof value !== 'function'
+const isChildren = (value: unknown): boolean => !!value && (Array.isArray(value) || typeof value === 'function')
 const pass = <T>(prop: Property<T>): T => prop as T
 const evaluate = <T>(prop: Property<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 

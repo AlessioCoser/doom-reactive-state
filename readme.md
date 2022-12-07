@@ -1,6 +1,6 @@
 # Doom Reactive State
 
-Super simple reactive state management and pure-js fine-grained reactive DOM components.
+Super simple reactive state management with a fine-grained reactive DOM elements.
 
 [![npm](https://img.shields.io/npm/v/doom-reactive-state?color=44CC11)](https://www.npmjs.com/package/doom-reactive-state)
 &nbsp;

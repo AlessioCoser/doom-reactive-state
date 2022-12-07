@@ -10,7 +10,7 @@ Super simple reactive state management and pure-js fine-grained reactive DOM com
 
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/doom-reactive-state)
 &nbsp;
-[![downloads](https://img.shields.io/npm/dt/doom-reactive-state.svg?colorB=007EC6)](https://www.npmjs.com/package/coinbase-pro-api)
+[![downloads](https://img.shields.io/npm/dt/doom-reactive-state.svg?colorB=007EC6)](https://www.npmjs.com/package/doom-reactive-state)
 &nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 

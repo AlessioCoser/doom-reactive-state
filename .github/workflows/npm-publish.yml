@@ -31,7 +31,6 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build
-      - run: echo "${{ github.ref_name }}"
-      # - run: npm run release ${{ github.ref_name }}
-      #  env:
-      #    NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - run: npm run release ${{ github.ref_name }}
+       env:
+         NODE_AUTH_TOKEN: ${{secrets.npm_token}}

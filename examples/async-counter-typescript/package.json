@@ -1,0 +1,17 @@
+{
+  "name": "async-count-history-typescript",
+  "scripts": {
+    "start": "parcel index.html"
+  },
+  "author": "Alessio Coser",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/packager-ts": "^2.8.0",
+    "@parcel/transformer-typescript-types": "^2.8.0",
+    "parcel": "^2.8.0",
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "doom-reactive-js": "^0.0.8"
+  }
+}

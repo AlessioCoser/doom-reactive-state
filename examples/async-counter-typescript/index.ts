@@ -1,5 +1,4 @@
-import { effect, signal, Signal } from '../src/reactivity'
-import { h } from '../src/dom'
+import { effect, signal, Signal, h } from 'doom-reactive-js'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -50,4 +49,6 @@ const App = () => {
   return Main({ counter })
 }
 
+// no need to use magic stuff to attach components to the dom,
+// we always return a DOM Element from our components
 document.body.appendChild(App())

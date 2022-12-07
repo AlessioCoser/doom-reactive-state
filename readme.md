@@ -14,6 +14,9 @@ Super simple reactive state management and pure-js dom.
 &nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 
+## Examples
+You can find some examples here: [./examples](./examples)
+
 ## Getting Started
 
 ### With Node.js - only pure reactive state
@@ -58,18 +61,11 @@ function App() {
 document.body.appendChild(App())
 ```
 
-
-
 # Contributing
 
 ## Run Tests
 ```
 npm test
-```
-
-## Run example
-```
-npm run example
 ```
 
 ## Publish a new package version

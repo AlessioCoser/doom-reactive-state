@@ -1,7 +1,7 @@
 {
   "name": "doom-reactive-js",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
@@ -9,6 +9,9 @@
     "build": "tsc",
     "example": "parcel example/index.html --dist-dir example/dist",
     "test": "jest"
+  },
+  "exports": {
+    ".": "./dist"
   },
   "jest": {
     "preset": "ts-jest"

@@ -1,4 +1,4 @@
-# Doom State JS
+# Doom Reactive JS
 
 Super simple reactive state management and pure-js dom.
 
@@ -14,17 +14,23 @@ Super simple reactive state management and pure-js dom.
 &nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 
-## Getting Started
+## Getting Started (with Node.js)
+Without the reactive dom
+1. Create a file called index.js
+    ```javascript
+    const { signal, effect } = require("doom-reactive-js")
 
-```javascript
-const { signal, effect } = require("doom-reactive-js")
+    const [count, setCount] = signal(1)
 
-const [count, setCount] = signal(1)
+    setInterval(() => setCount(count() + 1), 1000)
 
-setInterval(() => setCount(count() + 1), 1000)
-
-effect(() => console.log(count()))
-```
+    effect(() => console.log(count()))
+    ```
+2. Run the file with node
+    ```
+    node index.js
+    ```
+3. You will see that every second the incremented number will be printed
 
 ## Run example
 ```

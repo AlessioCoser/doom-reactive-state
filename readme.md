@@ -3,15 +3,15 @@
 Super simple reactive state management and pure-js dom.
 
 [![npm](https://img.shields.io/npm/v/doom-reactive-js?color=44CC11)](https://www.npmjs.com/package/doom-reactive-js)
-&nbsp;&nbsp;&nbsp;
+&nbsp;
 [![dependencies](https://img.shields.io/badge/dependencies-0-blue.svg?colorB=44CC11)](https://www.npmjs.com/package/doom-reactive-js?activeTab=dependencies)
-&nbsp;&nbsp;&nbsp;
+&nbsp;
 [![Test](https://github.com/AlessioCoser/doom-state-js/actions/workflows/test.yml/badge.svg)](https://github.com/AlessioCoser/doom-state-js/actions/workflows/test.yml)
 
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/doom-reactive-js)
-&nbsp;&nbsp;&nbsp;
+&nbsp;
 [![downloads](https://img.shields.io/npm/dt/doom-reactive-js.svg?colorB=007EC6)](https://www.npmjs.com/package/coinbase-pro-api)
-&nbsp;&nbsp;&nbsp;
+&nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 
 ## Getting Started

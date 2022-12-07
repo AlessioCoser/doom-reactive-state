@@ -1,4 +1,4 @@
-import { effect, signal, Signal, h } from 'doom-reactive-js'
+import { effect, signal, Signal, h } from 'doom-reactive-state'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {

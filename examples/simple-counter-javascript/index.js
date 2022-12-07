@@ -1,4 +1,4 @@
-import { signal, h } from 'doom-reactive-js'
+import { signal, h } from 'doom-reactive-state'
 
 const App = () => {
   // this is a non-reactive component it's out of the renderer loop since it isn't wrapped with the `effect` function

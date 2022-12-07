@@ -2,15 +2,15 @@
 
 Super simple reactive state management and pure-js fine-grained reactive DOM components.
 
-[![npm](https://img.shields.io/npm/v/doom-reactive-js?color=44CC11)](https://www.npmjs.com/package/doom-reactive-js)
+[![npm](https://img.shields.io/npm/v/doom-reactive-state?color=44CC11)](https://www.npmjs.com/package/doom-reactive-state)
 &nbsp;
-[![dependencies](https://img.shields.io/badge/dependencies-0-blue.svg?colorB=44CC11)](https://www.npmjs.com/package/doom-reactive-js?activeTab=dependencies)
+[![dependencies](https://img.shields.io/badge/dependencies-0-blue.svg?colorB=44CC11)](https://www.npmjs.com/package/doom-reactive-state?activeTab=dependencies)
 &nbsp;
 [![Test](https://github.com/AlessioCoser/doom-state-js/actions/workflows/test.yml/badge.svg)](https://github.com/AlessioCoser/doom-state-js/actions/workflows/test.yml)
 
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/doom-reactive-js)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/doom-reactive-state)
 &nbsp;
-[![downloads](https://img.shields.io/npm/dt/doom-reactive-js.svg?colorB=007EC6)](https://www.npmjs.com/package/coinbase-pro-api)
+[![downloads](https://img.shields.io/npm/dt/doom-reactive-state.svg?colorB=007EC6)](https://www.npmjs.com/package/coinbase-pro-api)
 &nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 
@@ -31,7 +31,7 @@ You can find some examples here: [./examples](./examples)
 
 1. Create a file called index.js
     ```javascript
-    const { signal, effect } = require("doom-reactive-js")
+    const { signal, effect } = require("doom-reactive-state")
 
     const [count, setCount] = signal(1)
 
@@ -49,7 +49,7 @@ You can find some examples here: [./examples](./examples)
 
 This is a simple increment counter component
 ```javascript
-const { signal, h } = require("doom-reactive-js")
+const { signal, h } = require("doom-reactive-state")
 
 function App() {
   const [count, setCount] = signal(1)

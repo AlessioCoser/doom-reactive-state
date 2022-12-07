@@ -20,7 +20,7 @@ jobs:
       - run: npm test
 
   publish:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,5 +31,5 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run release ${{ github.ref_name }}
-       env:
-         NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

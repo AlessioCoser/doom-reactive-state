@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2017",
     "lib": ["es2017", "dom"],
     "types": ["jest"],
     "module": "commonjs",
@@ -9,6 +9,7 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "moduleResolution": "NodeNext",
     "allowJs": false,
     "strict": true,
     "sourceMap": true,

@@ -1,7 +1,7 @@
 {
   "name": "doom-reactive-js",
   "repository":"https://github.com/AlessioCoser/doom-state-js",
-  "type": "module",
+  "type": "commonjs",
   "version": "%VERSION%",
   "description": "",
   "main": "index.js",

@@ -1,6 +1,6 @@
-# Doom Reactive JS
+# Doom Reactive State
 
-Super simple reactive state management and pure-js dom.
+Super simple reactive state management and pure-js fine-grained reactive DOM components.
 
 [![npm](https://img.shields.io/npm/v/doom-reactive-js?color=44CC11)](https://www.npmjs.com/package/doom-reactive-js)
 &nbsp;
@@ -13,6 +13,14 @@ Super simple reactive state management and pure-js dom.
 [![downloads](https://img.shields.io/npm/dt/doom-reactive-js.svg?colorB=007EC6)](https://www.npmjs.com/package/coinbase-pro-api)
 &nbsp;
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
+
+## Features
+1. Zero dependencies
+2. Just a few lines of code
+3. Super-Easy concepts
+4. No magic, you create components that are simple HTMLElements
+5. Only a single Pure-JS HTMLElement wrapper to enable reactivity on properties
+6. No compilation required (excluding Typescript transpilation)
 
 ## Examples
 You can find some examples here: [./examples](./examples)

@@ -1,5 +1,5 @@
 {
-  "name": "doom-reactive-js",
+  "name": "doom-reactive-state",
   "scripts": {
     "build": "tsc",
     "test": "jest",

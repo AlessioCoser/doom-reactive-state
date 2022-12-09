@@ -1,6 +1,6 @@
 # Doom Reactive State
 
-Super simple reactive state management with a fine-grained reactive DOM elements.
+Super simple reactive state management with fine-grained reactive DOM elements.
 
 [![npm](https://img.shields.io/npm/v/doom-reactive-state?color=44CC11)](https://www.npmjs.com/package/doom-reactive-state)
 &nbsp;
@@ -17,7 +17,7 @@ Super simple reactive state management with a fine-grained reactive DOM elements
 2. Just a few lines of code
 3. Super-Easy concepts
 4. No magic, you create components that are simple HTMLElements
-5. Only a single Pure-JS HTMLElement wrapper to enable reactivity on properties
+5. Only a single HTMLElement wrapper to enable reactivity on Element properties
 6. No compilation required (excluding Typescript transpilation)
 
 ## Examples

@@ -7,4 +7,12 @@ describe('reactivity', () => {
 
     expect(get()).toEqual(initial)
   })
+
+  it('set a new value', () => {
+    const [get, set] = signal(0)
+
+    set(1)
+
+    expect(get()).toEqual(1)
+  })
 })

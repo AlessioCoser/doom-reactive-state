@@ -1,5 +1,21 @@
 let runningEffect: Effect | null = null
 
+type EffectsRegistry = { runAll: () => void, register: () => void}
+const createEffectsRegistry = (): EffectsRegistry => {
+  const effects: Effect[] = []
+  const notYetRegistered = () => !effects.some(effect => effect === runningEffect)
+  const isNotRunning = (effect: Effect) => effect !== runningEffect
+
+  return {
+    runAll: () => effects.filter(isNotRunning).forEach(effect => effect.run()),
+    register: () => {
+      if(runningEffect && notYetRegistered()) {
+        effects.push(runningEffect)
+      }
+    }
+  }
+}
+
 type Effect = {run: () => void}
 export function effect(fn: () => void): void {
   const _effect = {
@@ -16,32 +32,20 @@ type Accessor<T> = () => T
 type Setter<T> = (value: T) => void
 export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
   let _signal: T = initial
-  const effects: Effect[] = []
+  const registry = createEffectsRegistry()
 
   const accessor = function () {
-    if (runningEffect && notYetRegistered(effects)) {
-      effects.push(runningEffect)
-    }
+    registry.register()
     return _signal
   }
 
   const setter = (value: T) => {
     _signal = value
-    effects
-      .filter(isNotRunning())
-      .forEach((effect) => effect.run())
+    registry.runAll()
   }
 
   return [
     accessor,
     setter
   ]
-}
-
-function isNotRunning(): (value: Effect, index: number, array: Effect[]) => unknown {
-  return effect => effect !== runningEffect
-}
-
-function notYetRegistered(effects: Effect[]) {
-  return !effects.some(effect => effect === runningEffect)
 }

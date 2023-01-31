@@ -1,11 +1,15 @@
 let runningEffect: Effect | null = null
 
-type Effect = () => void
-export function effect(fn: Effect) {
-  runningEffect = fn
-  const result = fn()
-  runningEffect = null
-  return result
+type Effect = {run: () => void}
+export function effect(fn: () => void): void {
+  const _effect = {
+    run() {
+      runningEffect = this
+      fn()
+      runningEffect = null
+    }
+  }
+  _effect.run()
 }
 
 type Accessor<T> = () => T
@@ -15,7 +19,7 @@ export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
   const effects: Effect[] = []
 
   const accessor = function () {
-    if (runningEffect) {
+    if (runningEffect && notYetRegistered(effects)) {
       effects.push(runningEffect)
     }
     return _signal
@@ -23,11 +27,21 @@ export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
 
   const setter = (value: T) => {
     _signal = value
-    effects.forEach((effect) => effect())
+    effects
+      .filter(isNotRunning())
+      .forEach((effect) => effect.run())
   }
 
   return [
     accessor,
     setter
   ]
+}
+
+function isNotRunning(): (value: Effect, index: number, array: Effect[]) => unknown {
+  return effect => effect !== runningEffect
+}
+
+function notYetRegistered(effects: Effect[]) {
+  return !effects.some(effect => effect === runningEffect)
 }

@@ -29,4 +29,13 @@ describe('reactivity', () => {
 
     expect(calls).toEqual([0, 1, 2, 3, 4, 5])
   })
+
+  it('update the state inside the effect', () => {
+    const [get, set] = signal(0)
+
+    effect(() => set(get() * 2))
+    set(5)
+
+    expect(get()).toEqual(10)
+  })
 })

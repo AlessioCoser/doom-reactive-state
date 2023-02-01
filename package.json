@@ -2,7 +2,8 @@
   "name": "handson-reactivity",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "dev": "cd example && npm start"
   },
   "jest": {
     "preset": "ts-jest",

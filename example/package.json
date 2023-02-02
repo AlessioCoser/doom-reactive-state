@@ -1,7 +1,7 @@
 {
   "name": "example",
   "scripts": {
-    "start": "parcel index.html"
+    "start": "rm -rf dist .parcel-cache && parcel index.html"
   },
   "author": "Alessio Coser",
   "license": "MIT",

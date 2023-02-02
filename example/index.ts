@@ -1,6 +1,10 @@
 import { h } from '../src/dom'
-// we always return a DOM Element from our components
+import { signal } from '../src/reactivity'
 
-const component = h("div", { onclick: () => alert('alert') }, ["test"])
+const Component = () => {
+  const [count, setCount] = signal(10)
 
-document.body.appendChild(component)
+  return h("div", { style: { fontSize: () => `${count()}px` }, onclick: () => setCount(count() + 5) }, ["Click me"])
+}
+
+document.body.appendChild(Component())

@@ -27,4 +27,11 @@ describe("dom", () => {
 
     expect(body.innerHTML).toEqual(`<div class="class1"></div>`)
   })
+
+  it('create a div element with style properties', () => {
+    const element = h("div", { style: { fontSize: '15px' } })
+    body.appendChild(element)
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 15px;"></div>`)
+  })
 })

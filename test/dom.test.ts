@@ -80,14 +80,13 @@ describe("dom", () => {
     expect(body.innerHTML).toEqual(`<div style="font-size: 15px;">Click me</div>`)
   })
 
-  it('update children on click', () => {
+  it('update text child on click', () => {
     const Element = () => {
       const [count, setCount] = signal(10)
 
-      const size = () => `Size: ${count()}px`
       const increase = () => setCount(count() + 5)
 
-      return h("div", { onclick: increase }, [size])
+      return h("div", { onclick: increase }, () => [`Size: ${count()}px`])
     }
     body.appendChild(Element())
 
@@ -96,5 +95,24 @@ describe("dom", () => {
     body.querySelector('div')?.click()
 
     expect(body.innerHTML).toEqual(`<div>Size: 15px</div>`)
+  })
+
+  it('update element child on click', () => {
+    const Element = () => {
+      const [count, setCount] = signal(10)
+
+      const increase = () => setCount(count() + 5)
+
+      return h("div", { onclick: increase }, () => [
+        h('strong', {}, () => [`Size: ${count()}px`])
+      ])
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div><strong>Size: 10px</strong></div>`)
+
+    body.querySelector('div')?.click()
+
+    expect(body.innerHTML).toEqual(`<div><strong>Size: 15px</strong></div>`)
   })
 })

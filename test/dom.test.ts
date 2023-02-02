@@ -1,4 +1,5 @@
 import { h } from '../src/dom';
+import { signal } from '../src/reactivity';
 
 const body = document.body
 
@@ -47,5 +48,17 @@ describe("dom", () => {
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="padding: 5px;"></div>`)
+  })
+
+  it('handle reactivity', () => {
+    const [count, setCount] = signal(14)
+    const element = h("div", { style: { fontSize: () => `${count()}px` } }, ["Increase"])
+    body.appendChild(element)
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 14px;">Increase</div>`)
+
+    setCount(20)
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 20px;">Increase</div>`)
   })
 })

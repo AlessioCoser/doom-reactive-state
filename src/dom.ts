@@ -1,7 +1,9 @@
 type Child = Node | string
+type Reactive<T> = T | (() => T)
+const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 type Properties<T extends keyof HTMLElementTagNameMap> = Partial<Omit<{
-  [K in keyof HTMLElementTagNameMap[T] as K extends keyof HTMLElementTagNameMap[T] ? K : never]: HTMLElementTagNameMap[T][K]
-}, 'style'> & { style: Styles }>
+  [K in keyof HTMLElementTagNameMap[T] as K extends keyof HTMLElementTagNameMap[T] ? K : never]: Reactive<HTMLElementTagNameMap[T][K]>
+}, 'style'> & { style: Reactive<Styles> }>
 
 type StylesDeclaration = Omit<CSSStyleDeclaration, 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item' | number>
 type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: StylesDeclaration[K] }
@@ -13,10 +15,11 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
 
   Object.entries(properties).forEach((property) => {
     const key = property[0] as keyof HTMLElementTagNameMap[K]
-    const value = property[1] as HTMLElementTagNameMap[K][keyof HTMLElementTagNameMap[K]]
+    const value = property[1] as Reactive<HTMLElementTagNameMap[K][keyof HTMLElementTagNameMap[K]]>
 
     if (key === 'style') {
-      Object.entries(value as Styles).forEach((styleAttribute) => {
+      const styleValue = evaluate(value as Reactive<Styles>)
+      Object.entries(styleValue).forEach((styleAttribute) => {
         const attributeKey = styleAttribute[0] as StyleKey
         const attributeValue = styleAttribute[1] as StyleProps
         if(attributeValue) {
@@ -26,7 +29,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
       return
     }
 
-    el[key] = value
+    el[key] = evaluate(value)
   })
 
   children.forEach((child) => appendChild(el, child))

@@ -1,6 +1,6 @@
 import { effect } from "./reactivity"
 
-type Child = Node | string
+type Child = Element | string
 type Reactive<T> = T | (() => T)
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
@@ -8,7 +8,7 @@ type Properties<T extends keyof HTMLElementTagNameMap> = Partial<Omit<{
   [K in keyof HTMLElementTagNameMap[T] as K extends keyof HTMLElementTagNameMap[T] ? K : never]: Reactive<HTMLElementTagNameMap[T][K]>
 }, 'style'> & { style: Reactive<Styles> }>
 
-type StylesDeclaration = Omit<CSSStyleDeclaration, 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item' | number>
+type StylesDeclaration = Omit<CSSStyleDeclaration, typeof Symbol.iterator | number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item'>
 type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
 type StyleKey = keyof Styles
 type StyleProps = Styles[keyof Styles]

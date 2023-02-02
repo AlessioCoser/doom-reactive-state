@@ -41,4 +41,11 @@ describe("dom", () => {
 
     expect(body.innerHTML).toEqual(`<div class="test" style="padding: 5px;"></div>`)
   })
+
+  it('create a div element with reactive style attributes', () => {
+    const element = h("div", { style: { padding: () => '5px' } })
+    body.appendChild(element)
+
+    expect(body.innerHTML).toEqual(`<div style="padding: 5px;"></div>`)
+  })
 })

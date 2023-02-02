@@ -6,7 +6,7 @@ type Properties<T extends keyof HTMLElementTagNameMap> = Partial<Omit<{
 }, 'style'> & { style: Reactive<Styles> }>
 
 type StylesDeclaration = Omit<CSSStyleDeclaration, 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item' | number>
-type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: StylesDeclaration[K] }
+type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
 type StyleKey = keyof Styles
 type StyleProps = Styles[keyof Styles]
 
@@ -23,7 +23,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
         const attributeKey = styleAttribute[0] as StyleKey
         const attributeValue = styleAttribute[1] as StyleProps
         if(attributeValue) {
-          el.style[attributeKey] = attributeValue
+          el.style[attributeKey] =  evaluate(attributeValue)
         }
       })
       return

@@ -61,4 +61,22 @@ describe("dom", () => {
 
     expect(body.innerHTML).toEqual(`<div style="font-size: 20px;">Increase</div>`)
   })
+
+  it('update div style property on click', () => {
+    const Element = () => {
+      const [count, setCount] = signal(10)
+
+      const fontSize = () => `${count()}px`
+      const increase = () => setCount(count() + 5)
+
+      return h("div", { style: { fontSize }, onclick: increase }, ["Click me"])
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 10px;">Click me</div>`)
+
+    body.querySelector('div')?.click()
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 15px;">Click me</div>`)
+  })
 })

@@ -13,7 +13,7 @@ type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclarati
 type StyleKey = keyof Styles
 type StyleProps = Styles[keyof Styles]
 
-export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Child[] = []): HTMLElementTagNameMap[K] {
+export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Reactive<Child>[] = []): HTMLElementTagNameMap[K] {
   const el: HTMLElementTagNameMap[K] = document.createElement(tag)
 
   Object.entries(properties).forEach((property) => {
@@ -43,7 +43,10 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
     effect(() => { el[key] = evaluate(value) })
   })
 
-  children.forEach((child) => appendChild(el, child))
+  effect(() => {
+    el.innerHTML = ''
+    children.forEach((child) => appendChild(el, evaluate(child)))
+  })
 
   return el
 }

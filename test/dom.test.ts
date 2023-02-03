@@ -115,4 +115,31 @@ describe("dom", () => {
 
     expect(body.innerHTML).toEqual(`<div><strong>Size: 15px</strong></div>`)
   })
+
+  it('h inside h', () => {
+    const [count, setCount] = signal(5)
+    const increase = () => setCount(count() + 5)
+
+    const text = (count: number) => count >= 10 ? `Size: ${count}px - ` : 'c'
+    const howBig = (count: number) => (count < 10) ? "CLICK ME" : (count < 20) ? "S" : (count < 40) ? "M" : (count < 60) ? "L" : "XL"
+
+    body.appendChild(h("div", {}, () => [
+      text(count()),
+      h('strong', {}, [howBig(count())])
+    ]))
+
+    expect(body.innerHTML).toEqual(`<div>c<strong>CLICK ME</strong></div>`)
+
+    increase()
+
+    expect(body.innerHTML).toEqual(`<div>Size: 10px - <strong>S</strong></div>`)
+
+    increase()
+
+    expect(body.innerHTML).toEqual(`<div>Size: 15px - <strong>S</strong></div>`)
+
+    increase()
+
+    expect(body.innerHTML).toEqual(`<div>Size: 20px - <strong>M</strong></div>`)
+  })
 })

@@ -1,4 +1,5 @@
 import { effect } from "./reactivity"
+import { updateChildren } from './updateChildren'
 
 type Child = Element | string
 type Reactive<T> = T | (() => T)
@@ -43,18 +44,17 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
     effect(() => { el[key] = evaluate(value) })
   })
 
-  effect(() => {
-    el.innerHTML = ''
-    evaluate(children).forEach((child) => appendChild(el, child))
-  })
+  effect(() =>  updateChildren(el, evaluateChildNodes(children)))
 
   return el
 }
 
-function appendChild(el: HTMLElement, child: Child) {
-  if (typeof child === 'string') {
-    el.appendChild(document.createTextNode(child))
-  } else {
-    el.appendChild(child)
-  }
+function evaluateChildNodes(children: Reactive<Child[]>): ChildNode[] {
+  return evaluate(children).map(toChildNode)
+}
+
+function toChildNode(child: Child): ChildNode {
+  return (typeof child === 'string') ?
+      document.createTextNode(child)
+      : child
 }

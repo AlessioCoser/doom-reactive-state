@@ -43,7 +43,12 @@ export function updateChildren(parentNode: Node, b: ChildNode[]) {
       }
 
       while (bStart < bEnd) {
-        parentNode.insertBefore(b[bStart++], node);
+        const l = b[bStart++]
+        try {
+          parentNode.insertBefore(l, node);
+        } catch (e) {
+          parentNode.insertBefore(l, parentNode.firstChild)
+        }
       }
     // remove
     } else if (bEnd === bStart) {

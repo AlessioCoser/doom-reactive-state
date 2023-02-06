@@ -11,8 +11,7 @@ type Properties<T extends keyof HTMLElementTagNameMap> = Partial<Omit<{
 
 type StylesDeclaration = Omit<CSSStyleDeclaration, typeof Symbol.iterator | number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item'>
 type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
-type StyleKey = keyof Styles
-type StyleProps = Styles[keyof Styles]
+type Style = {key: keyof Styles, value: Styles[keyof Styles]}
 
 export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Reactive<Child[]> = []): HTMLElementTagNameMap[K] {
   const el: HTMLElementTagNameMap[K] = document.createElement(tag)
@@ -23,14 +22,9 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
 
     if (key === 'style') {
       effect(() => {
-        const styleValue = evaluate(value as Reactive<Styles>)
-        Object.entries(styleValue).forEach((styleAttribute) => {
-          const attributeKey = styleAttribute[0] as StyleKey
-          const attributeValue = styleAttribute[1] as StyleProps
-
-          if(attributeValue) {
-            el.style[attributeKey] = evaluate(attributeValue)
-          }
+        const styles = evaluate(value as Reactive<Styles>)
+        toStyles(styles).forEach((style) => {
+          el.style[style.key] = evaluate(style.value) || ''
         })
       })
       return
@@ -47,6 +41,15 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
   effect(() =>  updateChildren(el, evaluateChildNodes(children)))
 
   return el
+}
+
+function toStyles(styleValue: Styles): Style[] {
+  return Object.entries(styleValue).map((styleAttribute) => {
+    return {
+      key: styleAttribute[0] as Style['key'],
+      value: styleAttribute[1] as Style['value']
+    }
+  })
 }
 
 function evaluateChildNodes(children: Reactive<Child[]>): ChildNode[] {

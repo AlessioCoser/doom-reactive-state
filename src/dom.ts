@@ -23,14 +23,15 @@ type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyle
 type Properties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
 }
+type Property<T extends keyof HTMLElementTagNameMap> = {
+  key: keyof HTMLElementTagNameMap[T],
+  value: Reactive<HTMLElementTagNameMap[T][keyof HTMLElementTagNameMap[T]]>
+}
 
 export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Reactive<Child[]> = []): HTMLElementTagNameMap[K] {
   const el: HTMLElementTagNameMap[K] = document.createElement(tag)
 
-  Object.entries(properties).forEach((property) => {
-    const key = property[0] as keyof HTMLElementTagNameMap[K]
-    const value = property[1] as Reactive<HTMLElementTagNameMap[K][keyof HTMLElementTagNameMap[K]]>
-
+  toProperties(properties).forEach(({key, value}) => {
     if (key === 'style') {
       effect(() => {
         const styles = evaluate(value as Reactive<Styles>)
@@ -52,6 +53,14 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
   effect(() =>  updateChildren(el, evaluateChildNodes(children)))
 
   return el
+}
+
+function toProperties<K extends keyof HTMLElementTagNameMap>(properties: Properties<K>): Property<K>[] {
+  return Object
+    .entries(properties)
+    .map((property) => {
+      return { key: property[0], value: property[1] } as Property<K>
+    })
 }
 
 function toStyles(styleValue: Styles): Style[] {

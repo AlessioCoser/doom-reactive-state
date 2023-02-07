@@ -11,19 +11,22 @@ type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T e
 type WritableKeysOf<T> = {[P in keyof T]: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>}[keyof T]
 type WritablePart<T> = Pick<T, WritableKeysOf<T>>;
 
-type NonFunctionPartNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
-type NonFunctionPart<T> = Pick<T, NonFunctionPartNames<T>>;
+type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T]
 
-type StylesDeclaration = NonFunctionPart<WritablePart<CSSStyleDeclaration>>
+type WritableCSSStyleDeclaration = WritablePart<CSSStyleDeclaration>
+type StylesDeclaration = Omit<WritableCSSStyleDeclaration, FunctionPropertyNames<WritableCSSStyleDeclaration>>
 type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
 type Style = {key: keyof Styles, value: Styles[keyof Styles]}
 type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>
 
-type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<HTMLElementTagNameMap[T]>>
+type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElementTagNameMap[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element>>
+type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
+type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
 
 type Properties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-}
+} & ElementEvents
+
 type Property<T extends keyof HTMLElementTagNameMap> = {
   key: keyof HTMLElementTagNameMap[T],
   value: Reactive<HTMLElementTagNameMap[T][keyof HTMLElementTagNameMap[T]]>

@@ -11,7 +11,10 @@ type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T e
 type WritableKeysOf<T> = {[P in keyof T]: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>}[keyof T]
 type WritablePart<T> = Pick<T, WritableKeysOf<T>>;
 
-type StylesDeclaration = Omit<CSSStyleDeclaration, typeof Symbol.iterator | number | 'length' | 'parentRule' | 'getPropertyPriority' | 'getPropertyValue' | 'removeProperty' | 'setProperty' | 'item'>
+type NonFunctionPartNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+type NonFunctionPart<T> = Pick<T, NonFunctionPartNames<T>>;
+
+type StylesDeclaration = NonFunctionPart<WritablePart<CSSStyleDeclaration>>
 type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
 type Style = {key: keyof Styles, value: Styles[keyof Styles]}
 type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>

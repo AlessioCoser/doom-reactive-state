@@ -3,7 +3,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest --verbose",
-    "dev": "cd example && npm start"
+    "dev": "cd dev && npm start"
   },
   "jest": {
     "preset": "ts-jest",

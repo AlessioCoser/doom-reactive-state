@@ -30,7 +30,8 @@ export function effect(fn: () => void): void {
 
 type Accessor<T> = () => T
 type Setter<T> = (value: T) => void
-export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
+export type Signal<T> = [Accessor<T>, Setter<T>]
+export function signal<T>(initial: T): Signal<T> {
   let _signal: T = initial
   const registry = createEffectsRegistry()
 

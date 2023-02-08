@@ -56,13 +56,16 @@ function App() {
     setCount(count() + 1)
   }
 
-  return h("div", [
-    h("h2", { innerText: 'Count: ' }, [
-      h('span', { innerText: () => `${count()}` })
+  return h("div", {}, [
+    h("h2", {}, [
+      "Count: ",
+      h('span', {}, () => [`${count()}`])
     ]),
-    h("button", { innerText: 'increment', onclick: increment }),
+    h("button", { onclick: increment }, ['increment']),
   ])
 }
+
+document.body.appendChild(App())
 
 document.body.appendChild(App())
 ```

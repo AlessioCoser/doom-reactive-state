@@ -80,6 +80,18 @@ describe("dom", () => {
     expect(body.innerHTML).toEqual(`<div class="test" style="font-size: 15px;">Click me</div>`)
   })
 
+  it('remove a style property using an empty value', () => {
+    const [visible, setVisible] = signal<string>('hidden')
+
+    body.appendChild(h("div", { style: { visibility: () => visible() } }, ["Click me"]))
+
+    expect(body.innerHTML).toEqual(`<div style="visibility: hidden;">Click me</div>`)
+    setVisible('visible')
+    expect(body.innerHTML).toEqual(`<div style="visibility: visible;">Click me</div>`)
+    setVisible('')
+    expect(body.innerHTML).toEqual(`<div style="">Click me</div>`)
+  })
+
   it('update text child on click', () => {
     const Element = () => {
       const [count, setCount] = signal(10)

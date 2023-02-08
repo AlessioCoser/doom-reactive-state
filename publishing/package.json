@@ -1,0 +1,11 @@
+{
+  "name": "doom-reactive-state",
+  "repository":"https://github.com/AlessioCoser/doom-reactive-state",
+  "type": "commonjs",
+  "version": "%VERSION%",
+  "description": "",
+  "main": "index.js",
+  "types": "types.d.ts",
+  "author": "Alessio Coser",
+  "license": "MIT"
+}

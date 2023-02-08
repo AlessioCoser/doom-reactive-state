@@ -1,4 +1,4 @@
-import { updateChildren } from '../src/updateChildren'
+import { updateChildren } from '../../src/dom/updateChildren'
 
 const body = document.body
 

@@ -1,4 +1,4 @@
-import { effect } from "./reactivity"
+import { effect } from "../reactivity"
 import { updateChildren } from './updateChildren'
 
 export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Reactive<Child[]> = []): HTMLElementTagNameMap[K] {

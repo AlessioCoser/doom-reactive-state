@@ -1,5 +1,5 @@
-import { h } from '../src/dom';
-import { signal } from '../src/reactivity';
+import { h } from '../../src/dom';
+import { signal } from '../../src/reactivity';
 
 const body = document.body
 

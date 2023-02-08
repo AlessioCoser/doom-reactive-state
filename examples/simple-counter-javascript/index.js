@@ -1,4 +1,4 @@
-import { signal, h } from '../../dist'
+import { signal, h } from 'doom-reactive-state'
 
 const App = () => {
   // this is a non-reactive component it's out of the renderer loop since it isn't wrapped with the `effect` function
@@ -15,11 +15,11 @@ const App = () => {
     h("h2", { className: 'a-class' }, [
       'Count: ',
       // all properties we want to react to changes must be functions
-      h('span', { innerText: () => `${count()}` })
+      h('span', {}, () => [`${count()}`])
     ]),
     // you can avoid the element reacting for a specific property: see innerText property, we pass it directly without any function
     // but since the state accessor is a function you can pass it directly and still react to it's change
-    h("button", { innerText: 'increment', onclick: increment }),
+    h("button", { onclick: increment }, ['increment']),
   ])
 }
 

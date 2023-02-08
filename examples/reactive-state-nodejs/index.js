@@ -1,4 +1,4 @@
-const { signal, effect } = require('../../dist')
+const { signal, effect } = require('doom-reactive-state')
 
 const [count, setCount] = signal(1)
 

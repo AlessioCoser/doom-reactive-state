@@ -6,12 +6,21 @@ const Component = () => {
 
   const increase = () => setCount(count() + 5)
   const fontSize = () => count() < 10 ? '10px' : `${count()}px`
-  const text = (count: number) => count >= 10 ? `Size: ${count}px - ` : ''
-  const howBig = (count: number) => (count < 10) ? "CLICK ME" : (count < 20) ? "small" : (count < 40) ? "medium" : (count < 60) ? "big" : "way too big!"
+  const textSize = () => count() >= 10 ? `Size: ${count()}px - ` : ''
+  const howBig = () => {
+    const size = count()
+    switch(true) {
+      case (size < 10): return "CLICK ME"
+      case (size < 20): return "small"
+      case (size < 40): return "medium"
+      case (size < 60): return "big"
+      default: return "way too big!"
+    }
+  }
 
   return h("div", { style: { fontSize }, onclick: increase }, [
-    () => text(count()),
-    h('strong', {}, [() => howBig(count())])
+    textSize,
+    h('strong', {}, [howBig])
   ])
 }
 

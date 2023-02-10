@@ -29,9 +29,19 @@ export function effect(fn: () => void): void {
   _effect.run()
 }
 
-export function derive<T>(fn: () => T): Accessor<T> {
-  const [get, set] = signal<T>(fn())
-  effect(() => set(fn()))
+export function derive<T>(a: () => T): Accessor<T>
+export function derive<T>(a: T, b?: (current: Accessor<T>) => T): Accessor<T>
+export function derive<T>(a: unknown, b?: unknown): Accessor<T> {
+  if (typeof a === 'function') {
+    const fn = a as () => T
+    const [get, set] = signal<T>(fn())
+    effect(() => set(fn()))
+    return get
+  }
+  const initial = a as T
+  const fn = b as (current: Accessor<T>) => T
+  const [get, set] = signal<T>(initial)
+  effect(() => set(fn(get)))
   return get
 }
 

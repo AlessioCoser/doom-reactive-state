@@ -73,4 +73,15 @@ describe('reactivity', () => {
     setSecond(3)
     expect(multiple()).toEqual(15)
   })
+
+  it('updating a derived array', () => {
+    const [get, set] = signal(2)
+    const history = derive<number[]>([], (current) => [get(), ...current()])
+
+    expect(history()).toEqual([2])
+    set(5)
+    expect(history()).toEqual([5, 2])
+    set(7)
+    expect(history()).toEqual([7, 5, 2])
+  })
 })

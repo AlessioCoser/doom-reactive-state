@@ -38,4 +38,16 @@ describe('reactivity', () => {
 
     expect(get()).toEqual(10)
   })
+
+  it('after a nested effects is completed the currentEffect should be the parent one', () => {
+    const [get, set] = signal(0)
+
+    effect(() => {
+      effect(() => {})
+      set(get() * 2)
+    })
+    set(5)
+
+    expect(get()).toEqual(10)
+  })
 })

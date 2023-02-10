@@ -20,9 +20,10 @@ type Effect = {run: () => void}
 export function effect(fn: () => void): void {
   const _effect = {
     run() {
+      const previousEffect = runningEffect
       runningEffect = this
       fn()
-      runningEffect = null
+      runningEffect = previousEffect
     }
   }
   _effect.run()

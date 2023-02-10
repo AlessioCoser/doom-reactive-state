@@ -7,13 +7,16 @@ const Main = ({ counter }: MainProps) => {
   const [count, setCount] = counter
   const [btnText, setBtnText] = signal('initial text')
   const [isLoading, setIsLoading] = signal(false)
+  // we can use a derived signal and maintain the state in sync
+  const doubledText = derive(() => `doubled is: ${count() * 2}`)
+  // we can also edit or update the derived signal (like adding an element to an array),
+  // but for this you have to set an initial value as first argument
   const history = derive<number[]>([], (h) => [count(), ...h()])
 
   // we can use setTimeout and setInterval outside re-rendered components
   setTimeout(() => setBtnText('updated text'), 2000)
   setTimeout(() => setCount(count() + 1), 5000)
 
-  // effect(() => setHistory([count(), ...history()]))
   effect(() => console.log('count effect', count()))
   effect(() => console.log('loading effect', isLoading()))
   effect(() => console.log('text effect', btnText()))
@@ -34,11 +37,16 @@ const Main = ({ counter }: MainProps) => {
   return h("div", {}, [
     // only functions inside objects are binded
     // all computed properties must be functions
-    h("h2", {}, () => [`count ${count()}`]),
-    // you can avoid the element reacting for a specific property: see children property, we pass it directly without any function
-    // but since the state accessor is a function you can pass it directly and still react to it's change
-    h("button", { disabled: isLoading, onclick: onButtonClick }, [`button ${btnText()}`]),
-    h("div", {}, () => history().map((it) => h("p", {}, [it.toString()])))
+    h("h2", {}, [() => `count ${count()}`]),
+    // you can use text accessor as reactive text children
+    doubledText,
+    h("p", {}, [
+      // you can avoid the element reacting for a specific property: see children property, we pass it directly without any function
+      // but since the state accessor is a function you can pass it directly and still react to it's change like isLoading
+      h("button", { style: { display: 'block' }, disabled: isLoading, onclick: onButtonClick }, [`button ${btnText()}`]),
+      // children array can also be reactive when wrapped in a function
+      h("div", {}, () => history().map((it) => h("p", {}, [it.toString()])))
+    ])
   ])
 }
 
@@ -52,7 +60,3 @@ const App = () => {
 // no need to use magic stuff to attach components to the dom,
 // we always return a DOM Element from our components
 document.body.appendChild(App())
-function derived<T>(arg0: never[]): [any] {
-  throw new Error('Function not implemented.')
-}
-

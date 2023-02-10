@@ -23,9 +23,29 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
     effect(() => { el[key] = evaluate(value) })
   })
 
-  effect(() =>  updateChildren(el, evaluateChildNodes(children)))
+  if(typeof children === 'function') {
+    effect(() => updateChildren(el, evaluateChildNodes(children)))
+  } else {
+    children.map(toChildNode).map(appendTo(el))
+  }
 
   return el
+}
+
+function t(text: Reactive<string>): Text {
+  if (typeof text === 'string') {
+    return document.createTextNode(text)
+  }
+  const textNode = document.createTextNode("")
+  effect(() => textNode.textContent = evaluate(text))
+  return textNode
+}
+
+function appendTo<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K]): ((c: ChildNode) => ChildNode) {
+  return (child: ChildNode) => {
+    element.appendChild(child)
+    return child
+  }
 }
 
 function toProperties<K extends keyof HTMLElementTagNameMap>(properties: Properties<K>): Property<K>[] {
@@ -50,15 +70,15 @@ function evaluateChildNodes(children: Reactive<Child[]>): ChildNode[] {
 }
 
 function toChildNode(child: Child): ChildNode {
-  return (typeof child === 'string') ?
-      document.createTextNode(child)
-      : child
+  return (typeof child === 'object')
+      ? child
+      : t(child)
 }
 
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 
-type Child = Element | string
+type Child = Element | Reactive<string>
 type Reactive<T> = T | (() => T)
 
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B

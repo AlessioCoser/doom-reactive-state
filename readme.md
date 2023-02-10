@@ -59,7 +59,7 @@ function App() {
   return h("div", {}, [
     h("h2", {}, [
       "Count: ",
-      h('span', {}, () => [`${count()}`])
+      h('span', {}, [() => `${count()}`])
     ]),
     h("button", { onclick: increment }, ['increment']),
   ])

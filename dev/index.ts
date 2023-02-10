@@ -9,9 +9,9 @@ const Component = () => {
   const text = (count: number) => count >= 10 ? `Size: ${count}px - ` : ''
   const howBig = (count: number) => (count < 10) ? "CLICK ME" : (count < 20) ? "small" : (count < 40) ? "medium" : (count < 60) ? "big" : "way too big!"
 
-  return h("div", { style: { fontSize }, onclick: increase }, () => [
-    text(count()),
-    h('strong', {}, [howBig(count())])
+  return h("div", { style: { fontSize }, onclick: increase }, [
+    () => text(count()),
+    h('strong', {}, [() => howBig(count())])
   ])
 }
 

@@ -98,7 +98,7 @@ describe("dom", () => {
 
       const increase = () => setCount(count() + 5)
 
-      return h("div", { onclick: increase }, () => [`Size: ${count()}px`])
+      return h("div", { onclick: increase }, [() => `Size: ${count()}px`])
     }
     body.appendChild(Element())
 

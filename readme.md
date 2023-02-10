@@ -52,17 +52,15 @@ const { signal, h } = require("doom-reactive-state")
 function App() {
   const [count, setCount] = signal(1)
 
-  function increment() {
-    setCount(count() + 1)
-  }
+  const onclick = () => setCount(count() + 1)
 
-  return h("div", {}, [
-    h("h2", {}, [
+  return h("div", { children: [
+    h("h2", { children: [
       "Count: ",
-      h('span', {}, [() => `${count()}`])
-    ]),
-    h("button", { onclick: increment }, ['increment']),
-  ])
+      h('span', { children: [() => `${count()}`] })
+    ]}),
+    h("button", { onclick, children: ['increment'] }),
+  ]})
 }
 
 document.body.appendChild(App())

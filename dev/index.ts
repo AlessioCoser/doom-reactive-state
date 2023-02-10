@@ -18,10 +18,10 @@ const Component = () => {
     }
   }
 
-  return h("div", { style: { fontSize }, onclick: increase }, [
+  return h("div", { style: { fontSize }, onclick: increase, children: [
     textSize,
-    h('strong', {}, [howBig])
-  ])
+    h('strong', { children: [howBig] })
+  ]})
 }
 
 document.body.appendChild(Component())

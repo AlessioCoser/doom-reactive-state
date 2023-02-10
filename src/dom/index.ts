@@ -1,10 +1,11 @@
 import { effect } from "../reactivity"
 import { updateChildren } from './updateChildren'
 
-export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Properties<K> = {}, children: Reactive<Child[]> = []): HTMLElementTagNameMap[K] {
+export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Properties<K> = {}): HTMLElementTagNameMap[K] {
   const el: HTMLElementTagNameMap[K] = document.createElement(tag)
+  const { children, ...properties} = props
 
-  toProperties(properties).forEach(({key, value}) => {
+  toProperties(properties as Properties<K>).forEach(({key, value}) => {
     if (key === 'style') {
       effect(() => {
         const styles = evaluate(value as Reactive<Styles>)
@@ -25,7 +26,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, properties: Pro
 
   if(typeof children === 'function') {
     effect(() => updateChildren(el, evaluateChildNodes(children)))
-  } else {
+  } else if (children) {
     children.map(toChildNode).map(appendTo(el))
   }
 
@@ -99,7 +100,7 @@ type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Ele
 
 type Properties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents
+} & ElementEvents & { children?: Reactive<Child[]> }
 
 type Property<T extends keyof HTMLElementTagNameMap> = {
   key: keyof HTMLElementTagNameMap[T],

@@ -16,7 +16,7 @@ describe("dom", () => {
   })
 
   it('create a div element with a text inside', () => {
-    const element = h("div", {}, ["ciao"])
+    const element = h("div", { children: ["ciao"] })
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual("<div>ciao</div>")
@@ -52,7 +52,7 @@ describe("dom", () => {
 
   it('handle reactivity', () => {
     const [count, setCount] = signal(14)
-    const element = h("div", { style: { fontSize: () => `${count()}px` } }, ["Increase"])
+    const element = h("div", { style: { fontSize: () => `${count()}px` }, children: ["Increase"] })
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="font-size: 14px;">Increase</div>`)
@@ -69,7 +69,7 @@ describe("dom", () => {
       const fontSize = () => `${count()}px`
       const increase = () => setCount(count() + 5)
 
-      return h("div", { className: 'test', style: { fontSize }, onclick: increase }, ["Click me"])
+      return h("div", { className: 'test', style: { fontSize }, onclick: increase, children: ["Click me"] })
     }
     body.appendChild(Element())
 
@@ -83,7 +83,7 @@ describe("dom", () => {
   it('remove a style property using an empty value', () => {
     const [visible, setVisible] = signal<string>('hidden')
 
-    body.appendChild(h("div", { style: { visibility: () => visible() } }, ["Click me"]))
+    body.appendChild(h("div", { style: { visibility: () => visible() }, children: ["Click me"] }))
 
     expect(body.innerHTML).toEqual(`<div style="visibility: hidden;">Click me</div>`)
     setVisible('visible')
@@ -97,8 +97,9 @@ describe("dom", () => {
       const [count, setCount] = signal(10)
 
       const increase = () => setCount(count() + 5)
+      const size = () => `Size: ${count()}px`
 
-      return h("div", { onclick: increase }, [() => `Size: ${count()}px`])
+      return h("div", { onclick: increase, children: [size] })
     }
     body.appendChild(Element())
 
@@ -115,9 +116,11 @@ describe("dom", () => {
 
       const increase = () => setCount(count() + 5)
 
-      return h("div", { onclick: increase }, () => [
-        h('strong', {}, () => [`Size: ${count()}px`])
-      ])
+      return h("div", { onclick: increase, children: [
+        h('strong', { children: [
+          () => `Size: ${count()}px`
+        ]})
+      ]})
     }
     body.appendChild(Element())
 
@@ -132,13 +135,13 @@ describe("dom", () => {
     const [count, setCount] = signal(5)
     const increase = () => setCount(count() + 5)
 
-    const text = (count: number) => count >= 10 ? `Size: ${count}px - ` : 'c'
-    const howBig = (count: number) => (count < 10) ? "CLICK ME" : (count < 20) ? "S" : (count < 40) ? "M" : (count < 60) ? "L" : "XL"
+    const text = () => count() >= 10 ? `Size: ${count()}px - ` : 'c'
+    const howBig = () => (count() < 10) ? "CLICK ME" : (count() < 20) ? "S" : (count() < 40) ? "M" : (count() < 60) ? "L" : "XL"
 
-    body.appendChild(h("div", {}, () => [
-      text(count()),
-      h('strong', {}, [howBig(count())])
-    ]))
+    body.appendChild(h("div", { children: [
+      text,
+      h('strong', { children: [howBig] })
+    ]}))
 
     expect(body.innerHTML).toEqual(`<div>c<strong>CLICK ME</strong></div>`)
 

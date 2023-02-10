@@ -12,6 +12,6 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "doom-reactive-state": "^0.0.21"
+    "doom-reactive-state": "^0.0.22"
   }
 }

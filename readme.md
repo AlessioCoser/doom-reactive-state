@@ -15,7 +15,7 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 ## Features
 1. Zero dependencies
 2. Just a few lines of code
-3. Super-Easy concepts
+3. Super-Easy reactive concepts (signal, effect, derived)
 4. No magic, you create components that are simple HTMLElements
 5. Only a single HTMLElement wrapper to enable reactivity on Element properties
 6. No compilation required (excluding Typescript transpilation)

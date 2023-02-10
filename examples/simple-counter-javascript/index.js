@@ -8,16 +8,16 @@ const App = () => {
   const increment = () => setCount(count() + 1)
 
   // only the changed attributes of the component will be updated
-  return h("div", {}, [
+  return h("div", { children: [
     // only functions inside objects listen to the state changes
-    h("h2", { className: 'a-class' }, [
+    h("h2", { className: 'a-class', children: [
       'Count: ',
       // all properties or text-children we want to react to changes must be functions
-      h('span', {}, [() => `${count()}`])
-    ]),
+      h('span', { children: [() => `${count()}`] })
+    ]}),
     // you can avoid the element reacting for a specific property: see children property, we pass it directly without any function
-    h("button", { onclick: increment }, ['increment']),
-  ])
+    h("button", { onclick: increment, children: ['increment'] }),
+  ]})
 }
 
 // no need to use magic stuff to attach components to the dom,

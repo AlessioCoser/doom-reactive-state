@@ -34,20 +34,20 @@ const Main = ({ counter }: MainProps) => {
     setIsLoading(false)
   }
 
-  return h("div", {}, [
+  return h("div", { children: [
     // only functions inside objects are binded
     // all computed properties must be functions
-    h("h2", {}, [() => `count ${count()}`]),
+    h("h2", { children: [() => `count ${count()}`]}),
     // you can use text accessor as reactive text children
     doubledText,
-    h("p", {}, [
+    h("p", { children: [
       // you can avoid the element reacting for a specific property: see children property, we pass it directly without any function
       // but since the state accessor is a function you can pass it directly and still react to it's change like isLoading
-      h("button", { style: { display: 'block' }, disabled: isLoading, onclick: onButtonClick }, [`button ${btnText()}`]),
+      h("button", { style: { display: 'block' }, disabled: isLoading, onclick: onButtonClick, children: [`button ${btnText()}`] }),
       // children array can also be reactive when wrapped in a function
-      h("div", {}, () => history().map((it) => h("p", {}, [it.toString()])))
-    ])
-  ])
+      h("div", { children: () => history().map((it) => h("p", { children: [it.toString()] })) })
+    ]})
+  ]})
 }
 
 const App = () => {

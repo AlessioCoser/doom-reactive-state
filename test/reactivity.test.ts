@@ -1,4 +1,4 @@
-import { effect, signal } from "../src/reactivity"
+import { derive, effect, signal } from "../src/reactivity"
 
 describe('reactivity', () => {
   it('get the initial value', () => {
@@ -49,5 +49,28 @@ describe('reactivity', () => {
     set(5)
 
     expect(get()).toEqual(10)
+  })
+
+  it('derived signal', () => {
+    const [get, set] = signal(1)
+
+    const derived = derive(() => get() * 2)
+
+    expect(derived()).toEqual(2)
+    set(8)
+    expect(derived()).toEqual(16)
+  })
+
+  it('derived with multiple signals', () => {
+    const [first, setFirst] = signal(2)
+    const [second, setSecond] = signal(2)
+
+    const multiple = derive(() => first() * second())
+
+    expect(multiple()).toEqual(4)
+    setFirst(5)
+    expect(multiple()).toEqual(10)
+    setSecond(3)
+    expect(multiple()).toEqual(15)
   })
 })

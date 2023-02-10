@@ -29,6 +29,12 @@ export function effect(fn: () => void): void {
   _effect.run()
 }
 
+export function derive<T>(fn: () => T): Accessor<T> {
+  const [get, set] = signal<T>(fn())
+  effect(() => set(fn()))
+  return get
+}
+
 type Accessor<T> = () => T
 type Setter<T> = (value: T) => void
 export type Signal<T> = [Accessor<T>, Setter<T>]

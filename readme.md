@@ -66,8 +66,6 @@ function App() {
 }
 
 document.body.appendChild(App())
-
-document.body.appendChild(App())
 ```
 
 # Contributing

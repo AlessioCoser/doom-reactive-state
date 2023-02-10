@@ -1,4 +1,4 @@
-import { effect, signal, Signal, h } from 'doom-reactive-state'
+import { effect, derive, signal, Signal, h } from 'doom-reactive-state'
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -7,13 +7,13 @@ const Main = ({ counter }: MainProps) => {
   const [count, setCount] = counter
   const [btnText, setBtnText] = signal('initial text')
   const [isLoading, setIsLoading] = signal(false)
-  const [history, setHistory] = signal<number[]>([])
+  const history = derive<number[]>([], (h) => [count(), ...h()])
 
   // we can use setTimeout and setInterval outside re-rendered components
   setTimeout(() => setBtnText('updated text'), 2000)
   setTimeout(() => setCount(count() + 1), 5000)
 
-  effect(() => setHistory([count(), ...history()]))
+  // effect(() => setHistory([count(), ...history()]))
   effect(() => console.log('count effect', count()))
   effect(() => console.log('loading effect', isLoading()))
   effect(() => console.log('text effect', btnText()))
@@ -52,3 +52,7 @@ const App = () => {
 // no need to use magic stuff to attach components to the dom,
 // we always return a DOM Element from our components
 document.body.appendChild(App())
+function derived<T>(arg0: never[]): [any] {
+  throw new Error('Function not implemented.')
+}
+

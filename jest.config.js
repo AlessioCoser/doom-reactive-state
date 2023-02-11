@@ -11,9 +11,9 @@ module.exports = {
   rootDir: __dirname,
   roots: ['test'],
   testEnvironment: 'jsdom',
-  preset: 'ts-jest',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transform: {
+    "^.+\\.ts$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
     "^.+\\.tsx$": [
       "ts-jest",
       {

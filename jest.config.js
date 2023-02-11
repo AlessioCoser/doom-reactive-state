@@ -20,7 +20,7 @@ module.exports = {
         tsconfig: {
           jsxImportSource: '<rootDir>/src/dom',
           jsx: "react-jsx",
-          outDir: "<rootDir>/dist",
+          outDir: "<rootDir>/dist-test",
         }
       }
     ]

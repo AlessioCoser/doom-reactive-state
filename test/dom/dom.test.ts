@@ -1,5 +1,5 @@
-import { h } from '../../src/dom';
-import { signal } from '../../src/reactivity';
+import { Child, h } from '../../src/dom';
+import { derive, signal } from '../../src/reactivity';
 
 const body = document.body
 
@@ -156,5 +156,22 @@ describe("dom", () => {
     increase()
 
     expect(body.innerHTML).toEqual(`<div>Size: 20px - <strong>M</strong></div>`)
+  })
+
+  it('update children based on status', () => {
+    const [count, setCount] = signal(5)
+    const increase = () => setCount(count() + 5)
+    const toChild = (count: number) => h('p', { children: count.toString() })
+    const children = derive<Child[]>([], (current) => [...current(), toChild(count())])
+
+    body.appendChild(h("div", { children }))
+
+    expect(body.innerHTML).toEqual(`<div><p>5</p></div>`)
+
+    increase()
+    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p></div>`)
+
+    increase()
+    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p><p>15</p></div>`)
   })
 })

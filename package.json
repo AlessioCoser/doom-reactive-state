@@ -8,6 +8,7 @@
   },
   "jest": {
     "preset": "ts-jest",
+    "roots": ["test", "src"],
     "testEnvironment": "jsdom",
     "testMatch": [
       "**/*.test.ts"

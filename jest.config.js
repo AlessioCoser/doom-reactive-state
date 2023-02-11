@@ -14,7 +14,7 @@ module.exports = {
   preset: 'ts-jest',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.tsx$": [
       "ts-jest",
       {
         tsconfig: {

@@ -1,4 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
+
+console.log(">>>> DIRNAME", __dirname)
 module.exports = {
   // globals: {
   //   'ts-jest': {

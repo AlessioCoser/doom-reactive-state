@@ -11,7 +11,7 @@ module.exports = {
   // },
   preset: 'ts-jest',
   rootDir: __dirname,
-  roots: ['test'],
+  roots: ['test', 'src'],
   testEnvironment: 'jsdom',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transformIgnorePatterns: ['/node_modules/'],

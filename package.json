@@ -1,7 +1,7 @@
 {
   "name": "doom-reactive-state",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "jest --verbose --coverage",
     "dev": "cd dev && npm start",
     "release": "npm run build && ./publishing/publish.sh $1"

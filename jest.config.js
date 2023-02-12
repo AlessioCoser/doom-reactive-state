@@ -9,14 +9,14 @@ module.exports = {
   //     },
   //   },
   // },
-  preset: 'ts-jest',
+  // preset: 'ts-jest',
   rootDir: __dirname,
   roots: ['test', 'src'],
   testEnvironment: 'jsdom',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transformIgnorePatterns: ['/node_modules/'],
   transform: {
-    "test/.+\\.tsx": [
+    ".+": [
       "ts-jest",
       {
         tsconfig: {

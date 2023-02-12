@@ -9,13 +9,14 @@ module.exports = {
   //     },
   //   },
   // },
-  // preset: 'ts-jest',
+  preset: 'ts-jest',
   rootDir: __dirname,
   roots: ['test'],
   testEnvironment: 'jsdom',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
+  transformIgnorePatterns: ['/node_modules/'],
   transform: {
-    "^.+\\.tsx?$": [
+    "test/.+\\.tsx": [
       "ts-jest",
       {
         tsconfig: {
@@ -40,7 +41,7 @@ module.exports = {
         }
       }
     ],
-    "^.+\\.ts$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
+    // "^.+\\.ts$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
     // "^.+\\.tsx$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.test.json' } ],
   },
   // collectCoverage: true,

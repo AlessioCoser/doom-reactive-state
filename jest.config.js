@@ -14,18 +14,18 @@ module.exports = {
   testEnvironment: 'jsdom',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        tsconfig: {
-          jsxImportSource: '<rootDir>/src/dom',
-          jsx: "react-jsx",
-          outDir: "<rootDir>/dist-test",
-        }
-      }
-    ],
+    // "^.+\\.tsx?$": [
+    //   "ts-jest",
+    //   {
+    //     tsconfig: {
+    //       jsxImportSource: '<rootDir>/src/dom',
+    //       jsx: "react-jsx",
+    //       outDir: "<rootDir>/dist-test",
+    //     }
+    //   }
+    // ],
     "^.+\\.ts?$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
-    // "^.+\\.tsx$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.test.json' } ],
+    "^.+\\.tsx$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.test.json' } ],
   },
   // collectCoverage: true,
   // setupFiles: ['<rootDir>/jest.setup.js'],

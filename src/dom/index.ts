@@ -24,11 +24,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Properti
     effect(() => { el[key] = evaluate(value) })
   })
 
-  if(typeof children === 'function') {
-    effect(() => updateChildren(el, evaluateChildNodes(children)))
-  } else if (children) {
-    children.map(toChildNode).map(appendTo(el))
-  }
+  addChildren(el, children)
 
   return el
 }
@@ -40,6 +36,16 @@ function t(text: Reactive<string>): Text {
   const textNode = document.createTextNode("")
   effect(() => textNode.textContent = evaluate(text))
   return textNode
+}
+
+function addChildren<K extends keyof HTMLElementTagNameMap>(el: HTMLElementTagNameMap[K], children: Children | undefined) {
+  if(typeof children === 'function') {
+    effect(() => updateChildren(el, evaluateChildNodes(children)))
+  } else if (Array.isArray(children)) {
+    children.map(toChildNode).map(appendTo(el))
+  } else if (children) {
+    [children].map(toChildNode).map(appendTo(el))
+  }
 }
 
 function appendTo<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTagNameMap[K]): ((c: ChildNode) => ChildNode) {
@@ -66,8 +72,9 @@ function toStyles(styleValue: Styles): Style[] {
   })
 }
 
-function evaluateChildNodes(children: Reactive<Child[]>): ChildNode[] {
-  return evaluate(children).map(toChildNode)
+function evaluateChildNodes(children: Reactive<Child[] | Child>): ChildNode[] {
+  const reactive = evaluate(children)
+  return Array.isArray(reactive) ? reactive.map(toChildNode) : [toChildNode(reactive)]
 }
 
 function toChildNode(child: Child): ChildNode {
@@ -79,7 +86,8 @@ function toChildNode(child: Child): ChildNode {
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 
-type Child = Element | Reactive<string>
+type Children = Reactive<Child[] | Child>
+export type Child = Element | Reactive<string>
 type Reactive<T> = T | (() => T)
 
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B
@@ -100,7 +108,7 @@ type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Ele
 
 type Properties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents & { children?: Reactive<Child[]> }
+} & ElementEvents & { children?: Children }
 
 type Property<T extends keyof HTMLElementTagNameMap> = {
   key: keyof HTMLElementTagNameMap[T],

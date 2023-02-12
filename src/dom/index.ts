@@ -102,7 +102,7 @@ type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclarati
 type Style = {key: keyof Styles, value: Styles[keyof Styles]}
 type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>
 
-type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElementTagNameMap[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element>>
+type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElementTagNameMap[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
 type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
 type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
 

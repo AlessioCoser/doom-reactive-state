@@ -1,6 +1,5 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 
-console.log(">>>> DIRNAME", __dirname)
 module.exports = {
   // globals: {
   //   'ts-jest': {
@@ -16,18 +15,33 @@ module.exports = {
   testEnvironment: 'jsdom',
   testMatch: [ '<rootDir>/**/*.test.{ts,tsx}' ],
   transform: {
-    // "^.+\\.tsx?$": [
-    //   "ts-jest",
-    //   {
-    //     tsconfig: {
-    //       jsxImportSource: '<rootDir>/src/dom',
-    //       jsx: "react-jsx",
-    //       outDir: "<rootDir>/dist-test",
-    //     }
-    //   }
-    // ],
-    "^.+\\.ts?$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
-    "^.+\\.tsx$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.test.json' } ],
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          target: "es2017",
+          lib: ["es2017", "dom", "dom.iterable"],
+          types: ["jest"],
+          module: "commonjs",
+          esModuleInterop: true,
+          declaration: true,
+          noImplicitAny: true,
+          removeComments: true,
+          preserveConstEnums: true,
+          moduleResolution: "node",
+          jsx: "react-jsx",
+          jsxImportSource: '<rootDir>/src/dom',
+          allowJs: false,
+          strict: true,
+          sourceMap: true,
+          outDir: "./dist",
+          // outDir: "<rootDir>/dist-test",
+          rootDir: "./src"
+        }
+      }
+    ],
+    "^.+\\.ts$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.json' } ],
+    // "^.+\\.tsx$": [ "ts-jest", { tsconfig: '<rootDir>/tsconfig.test.json' } ],
   },
   // collectCoverage: true,
   // setupFiles: ['<rootDir>/jest.setup.js'],

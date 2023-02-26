@@ -1,3 +1,4 @@
+import { Component } from "../../src/dom";
 import { Accessor, effect, signal } from "../../src/reactivity";
 
 type ButtonProps = {
@@ -5,7 +6,7 @@ type ButtonProps = {
   text: Accessor<string>;
   onButtonClick: () => void;
 };
-const Button = ({ size, text, onButtonClick }: ButtonProps) => {
+const Button: Component<ButtonProps> = ({ size, text, onButtonClick }) => {
   const [isLoading, setIsLoading] = signal(false);
   const fontSize = () => `${size()}em`;
 

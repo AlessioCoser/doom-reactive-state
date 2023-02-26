@@ -1,121 +1,12 @@
 import { Properties, Component as _Component } from ".";
 
 type DOMElement = Element;
+type NativeElement = Element
 
 export namespace JSX {
-  type Element = Node
+  type Element = NativeElement
   type Component<P> = _Component<P>
-  interface IntrinsicElements {
-    "a": Properties<"a">;
-    "abbr": Properties<"abbr">;
-    "address": Properties<"address">;
-    "area": Properties<"area">;
-    "article": Properties<"article">;
-    "aside": Properties<"aside">;
-    "audio": Properties<"audio">;
-    "b": Properties<"b">;
-    "base": Properties<"base">;
-    "bdi": Properties<"bdi">;
-    "bdo": Properties<"bdo">;
-    "blockquote": Properties<"blockquote">;
-    "body": Properties<"body">;
-    "br": Properties<"br">;
-    "button": Properties<"button">;
-    "canvas": Properties<"canvas">;
-    "caption": Properties<"caption">;
-    "cite": Properties<"cite">;
-    "code": Properties<"code">;
-    "col": Properties<"col">;
-    "colgroup": Properties<"colgroup">;
-    "data": Properties<"data">;
-    "datalist": Properties<"datalist">;
-    "dd": Properties<"dd">;
-    "del": Properties<"del">;
-    "details": Properties<"details">;
-    "dfn": Properties<"dfn">;
-    "dialog": Properties<"dialog">;
-    "div": Properties<"div">;
-    "dl": Properties<"dl">;
-    "dt": Properties<"dt">;
-    "em": Properties<"em">;
-    "embed": Properties<"embed">;
-    "fieldset": Properties<"fieldset">;
-    "figcaption": Properties<"figcaption">;
-    "figure": Properties<"figure">;
-    "footer": Properties<"footer">;
-    "form": Properties<"form">;
-    "h1": Properties<"h1">;
-    "h2": Properties<"h2">;
-    "h3": Properties<"h3">;
-    "h4": Properties<"h4">;
-    "h5": Properties<"h5">;
-    "h6": Properties<"h6">;
-    "head": Properties<"head">;
-    "header": Properties<"header">;
-    "hgroup": Properties<"hgroup">;
-    "hr": Properties<"hr">;
-    "html": Properties<"html">;
-    "i": Properties<"i">;
-    "iframe": Properties<"iframe">;
-    "img": Properties<"img">;
-    "input": Properties<"input">;
-    "ins": Properties<"ins">;
-    "kbd": Properties<"kbd">;
-    "label": Properties<"label">;
-    "legend": Properties<"legend">;
-    "li": Properties<"li">;
-    "link": Properties<"link">;
-    "main": Properties<"main">;
-    "map": Properties<"map">;
-    "mark": Properties<"mark">;
-    "menu": Properties<"menu">;
-    "meta": Properties<"meta">;
-    "meter": Properties<"meter">;
-    "nav": Properties<"nav">;
-    "noscript": Properties<"noscript">;
-    "object": Properties<"object">;
-    "ol": Properties<"ol">;
-    "optgroup": Properties<"optgroup">;
-    "option": Properties<"option">;
-    "output": Properties<"output">;
-    "p": Properties<"p">;
-    "picture": Properties<"picture">;
-    "pre": Properties<"pre">;
-    "progress": Properties<"progress">;
-    "q": Properties<"q">;
-    "rp": Properties<"rp">;
-    "rt": Properties<"rt">;
-    "ruby": Properties<"ruby">;
-    "s": Properties<"s">;
-    "samp": Properties<"samp">;
-    "script": Properties<"script">;
-    "section": Properties<"section">;
-    "select": Properties<"select">;
-    "slot": Properties<"slot">;
-    "small": Properties<"small">;
-    "source": Properties<"source">;
-    "span": Properties<"span">;
-    "strong": Properties<"strong">;
-    "style": Properties<"style">;
-    "sub": Properties<"sub">;
-    "summary": Properties<"summary">;
-    "sup": Properties<"sup">;
-    "table": Properties<"table">;
-    "tbody": Properties<"tbody">;
-    "td": Properties<"td">;
-    "template": Properties<"template">;
-    "textarea": Properties<"textarea">;
-    "tfoot": Properties<"tfoot">;
-    "th": Properties<"th">;
-    "thead": Properties<"thead">;
-    "time": Properties<"time">;
-    "title": Properties<"title">;
-    "tr": Properties<"tr">;
-    "track": Properties<"track">;
-    "u": Properties<"u">;
-    "ul": Properties<"ul">;
-    "var": Properties<"var">;
-    "video": Properties<"video">;
-    "wbr": Properties<"wbr">;
- }
+  type IntrinsicElements = {
+    [K in keyof HTMLElementTagNameMap]?: Properties<K>
+  }
 }

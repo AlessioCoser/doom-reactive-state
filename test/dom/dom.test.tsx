@@ -1,4 +1,5 @@
 /** @jsxImportSource ../../src/dom */
+import { expect, describe, it, beforeEach } from 'vitest'
 import { signal } from '../../src/reactivity';
 
 const body = document.body

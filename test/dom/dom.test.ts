@@ -1,3 +1,4 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { h } from '../../src/dom';
 import { derive, signal } from '../../src/reactivity';
 

@@ -1,3 +1,4 @@
+import { expect, describe, it } from 'vitest'
 import { derive, effect, signal } from "../src/reactivity"
 
 describe('reactivity', () => {

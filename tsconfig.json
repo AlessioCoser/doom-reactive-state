@@ -1,20 +1,27 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "lib": ["es2017", "dom", "dom.iterable"],
-    "types": ["jest"],
-    "module": "commonjs",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "moduleResolution": "Node",
+    "strict": true,
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
     "declaration": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "moduleResolution": "node",
     "allowJs": false,
-    "strict": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "jsx": "react-jsx",
+    "jsxImportSource": "src/dom",
+    "outDir": "dist"
   },
-  "include": ["./src"]
+  "include": ["src"]
 }

@@ -1,9 +1,10 @@
-import { Properties } from ".";
+import { Properties, Component as _Component } from ".";
 
 type DOMElement = Element;
 
 export namespace JSX {
   type Element = Node
+  type Component<P> = _Component<P>
   interface IntrinsicElements {
     "a": Properties<"a">;
     "abbr": Properties<"abbr">;

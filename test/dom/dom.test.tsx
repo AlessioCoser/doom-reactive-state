@@ -151,4 +151,16 @@ describe("dom", () => {
 
     expect(body.innerHTML).toEqual(`<div>Size: 20px - <strong>M</strong></div>`)
   })
+
+  it('nested elements', () => {
+    const Nested = ({ name }: {name: string}) => {
+      return <p className={name}>Nested</p>
+    }
+    const Element = () => {
+      return <div className="Element"><Nested name={'name'} /></div>
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div class="Element"><p class="name">Nested</p></div>`)
+  })
 })

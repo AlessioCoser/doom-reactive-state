@@ -1,4 +1,4 @@
-import { Child, h } from '../../src/dom';
+import { h } from '../../src/dom';
 import { derive, signal } from '../../src/reactivity';
 
 const body = document.body
@@ -161,8 +161,8 @@ describe("dom", () => {
   it('update children based on status', () => {
     const [count, setCount] = signal(5)
     const increase = () => setCount(count() + 5)
-    const toChild = (count: number) => h('p', { children: count.toString() })
-    const children = derive<Child[]>([], (current) => [...current(), toChild(count())])
+    const toElement = (count: number) => h('p', { children: count.toString() })
+    const children = derive<Element[]>([], (current) => [...current(), toElement(count())])
 
     body.appendChild(h("div", { children }))
 
@@ -173,5 +173,17 @@ describe("dom", () => {
 
     increase()
     expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p><p>15</p></div>`)
+  })
+
+  it('nested elements', () => {
+    const Nested = ({ name }: {name: string}) => {
+      return h("p", { className: name, children: ["Nested"] })
+    }
+    const Element = () => {
+      return h("div", { className: "Element", children: [h(Nested, {name: 'name'})] })
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div class="Element"><p class="name">Nested</p></div>`)
   })
 })

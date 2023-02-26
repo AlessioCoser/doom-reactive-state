@@ -1,9 +1,15 @@
 import { effect } from "../reactivity"
 import { updateChildren } from './updateChildren'
 
-export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Properties<K> = {}): HTMLElementTagNameMap[K] {
-  const el: HTMLElementTagNameMap[K] = document.createElement(tag)
-  const { children, ...properties} = props
+export function h<P>(component: Component<P>, props?: P): Element
+export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: Properties<K>): Element
+export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): Element {
+  if (typeof component === 'function') {
+    return (component as Component<P>)(props as P)
+  }
+
+  const el: HTMLElementTagNameMap[K] = document.createElement(component as K)
+  const { children, ...properties} = props as Properties<K>
 
   toProperties(properties as Properties<K>).forEach(({key, value}) => {
     if (key === 'style') {
@@ -86,8 +92,9 @@ function toChildNode(child: Child): ChildNode {
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 
+export type Component<P = {}> = (props: P) => Element
 type Children = Reactive<Child[] | Child>
-export type Child = Element | Reactive<string>
+type Child = Element | Reactive<string>
 type Reactive<T> = T | (() => T)
 
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B
@@ -106,7 +113,7 @@ type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElem
 type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
 type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
 
-type Properties<T extends keyof HTMLElementTagNameMap> = {
+export type Properties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
 } & ElementEvents & { children?: Children }
 

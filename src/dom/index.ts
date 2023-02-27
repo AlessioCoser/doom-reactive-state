@@ -2,9 +2,9 @@ import { effect } from "../reactivity"
 import { updateChildren } from './updateChildren'
 export type { JSX } from "./jsx"
 
-export function h<P>(component: DoomComponent<P>, props?: P): DoomElement
-export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: DoomProperties<K>): DoomElement
-export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): DoomElement {
+export function h<P>(component: DoomComponent<P>, props?: P): Element
+export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: DoomProperties<K>): Element
+export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): Element {
   if (typeof component === 'function') {
     return (component as DoomComponent<P>)(props as P)
   }
@@ -93,8 +93,7 @@ function toChildNode(child: Child): ChildNode {
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 
-export type DoomElement = Element | Text
-export type DoomComponent<P = {}> = (props: P) => DoomElement
+export type DoomComponent<P = {}> = (props: P) => Element
 type Children = Reactive<Child[] | Child>
 type Child = Element | Reactive<string>
 type Reactive<T> = T | (() => T)

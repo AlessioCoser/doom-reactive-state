@@ -1,10 +1,9 @@
-import { Properties, Component as _Component } from ".";
+import { DoomProperties, DoomComponent, DoomElement } from ".";
 
-type NativeElement = Element
 export namespace JSX {
-  export type Element = NativeElement
-  export type Component<P> = _Component<P>
+  export type Element = DoomElement
+  export type Component<P> = DoomComponent<P>
   export type IntrinsicElements = {
-    [K in keyof HTMLElementTagNameMap]?: Properties<K>
+    [K in keyof HTMLElementTagNameMap]?: DoomProperties<K>
   }
 }

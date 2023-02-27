@@ -1,17 +1,18 @@
 import { effect } from "../reactivity"
 import { updateChildren } from './updateChildren'
+export type { JSX } from "./jsx"
 
-export function h<P>(component: Component<P>, props?: P): Element
-export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: Properties<K>): Element
-export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): Element {
+export function h<P>(component: DoomComponent<P>, props?: P): DoomElement
+export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: DoomProperties<K>): DoomElement
+export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): DoomElement {
   if (typeof component === 'function') {
-    return (component as Component<P>)(props as P)
+    return (component as DoomComponent<P>)(props as P)
   }
 
   const el: HTMLElementTagNameMap[K] = document.createElement(component as K)
-  const { children, ...properties} = props as Properties<K>
+  const { children, ...properties} = props as DoomProperties<K>
 
-  toProperties(properties as Properties<K>).forEach(({key, value}) => {
+  toProperties(properties as DoomProperties<K>).forEach(({key, value}) => {
     if (key === 'style') {
       effect(() => {
         const styles = evaluate(value as Reactive<Styles>)
@@ -61,11 +62,11 @@ function appendTo<K extends keyof HTMLElementTagNameMap>(element: HTMLElementTag
   }
 }
 
-function toProperties<K extends keyof HTMLElementTagNameMap>(properties: Properties<K>): Property<K>[] {
+function toProperties<K extends keyof HTMLElementTagNameMap>(properties: DoomProperties<K>): DoomProperty<K>[] {
   return Object
     .entries(properties)
     .map((property) => {
-      return { key: property[0], value: property[1] } as Property<K>
+      return { key: property[0], value: property[1] } as DoomProperty<K>
     })
 }
 
@@ -92,7 +93,8 @@ function toChildNode(child: Child): ChildNode {
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
 
-export type Component<P = {}> = (props: P) => Element
+export type DoomElement = Element | Text
+export type DoomComponent<P = {}> = (props: P) => DoomElement
 type Children = Reactive<Child[] | Child>
 type Child = Element | Reactive<string>
 type Reactive<T> = T | (() => T)
@@ -113,11 +115,11 @@ type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElem
 type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
 type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
 
-export type Properties<T extends keyof HTMLElementTagNameMap> = {
+export type DoomProperties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
 } & ElementEvents & { children?: Children }
 
-type Property<T extends keyof HTMLElementTagNameMap> = {
+type DoomProperty<T extends keyof HTMLElementTagNameMap> = {
   key: keyof HTMLElementTagNameMap[T],
   value: Reactive<HTMLElementTagNameMap[T][keyof HTMLElementTagNameMap[T]]>
 }

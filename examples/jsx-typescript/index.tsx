@@ -1,11 +1,12 @@
 import { Component, Accessor, effect, signal } from "doom-reactive-state";
+import { JSX } from "doom-reactive-state/dom";
 
 type ButtonProps = {
   size: Accessor<number>;
-  text: Accessor<string>;
   onButtonClick: () => void;
+  children: JSX.Element[]
 };
-const Button: Component<ButtonProps> = ({ size, text, onButtonClick }) => {
+const Button: Component<ButtonProps> = ({ size, onButtonClick, children }) => {
   const [isLoading, setIsLoading] = signal(false);
   const fontSize = () => `${size()}em`;
 
@@ -22,7 +23,7 @@ const Button: Component<ButtonProps> = ({ size, text, onButtonClick }) => {
 
   return (
     <button style={{ fontSize }} disabled={isLoading} onclick={onClick}>
-      button {text}
+      {children}
     </button>
   );
 };
@@ -44,7 +45,7 @@ const App = () => {
         onButtonClick={onButtonClick}
         text={btnText}
         size={count}
-      ></Button>
+      >button {count}</Button>
     </div>
   );
 };

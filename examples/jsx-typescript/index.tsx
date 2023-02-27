@@ -1,5 +1,4 @@
-import { Component } from "../../src/dom";
-import { Accessor, effect, signal } from "../../src/reactivity";
+import { Component, Accessor, effect, signal } from "doom-reactive-state";
 
 type ButtonProps = {
   size: Accessor<number>;

@@ -10,7 +10,7 @@
     "preserveConstEnums": true,
     "moduleResolution": "node",
     "jsx": "react-jsx",
-    "jsxImportSource": "../../src/dom",
+    "jsxImportSource": "doom-reactive-state/dom",
     "allowJs": false,
     "strict": true,
     "sourceMap": true

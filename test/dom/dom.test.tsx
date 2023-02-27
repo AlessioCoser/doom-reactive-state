@@ -1,6 +1,7 @@
 /** @jsxImportSource ../../src/dom */
-import { expect, describe, it, beforeEach } from 'vitest'
-import { signal } from '../../src/reactivity';
+import { expect, describe, it, beforeEach } from 'vitest';
+import { JSX } from '../../src/dom';
+import { Accessor, signal } from '../../src/reactivity';
 
 const body = document.body
 
@@ -163,5 +164,18 @@ describe("dom", () => {
     body.appendChild(Element())
 
     expect(body.innerHTML).toEqual(`<div class="Element"><p class="name">Nested</p></div>`)
+  })
+
+  it('elements have a children prop by default (children must not be defined in Props type)', () => {
+    type Props = { size: number }
+    const Nested: JSX.Component<Props> = ({ size, children }) => {
+      return <p style={{ fontSize: `${size}px` }}>{children}</p>
+    }
+    const Element = () => {
+      return <div><Nested size={12}>Name</Nested></div>
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div><p style="font-size: 12px;">Name</p></div>`)
   })
 })

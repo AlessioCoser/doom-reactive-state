@@ -18,7 +18,7 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 3. Super-Easy reactive concepts (signal, effect, derived)
 4. No magic, you create components that are simple HTMLElements
 5. Only a single HTMLElement wrapper to enable reactivity on Element properties
-6. No compilation required (excluding Typescript transpilation)
+6. No compilation required (excluding Typescript transpilation or the eventual jsx/tsx compilation)
 
 ## Examples
 You can find some examples here: [./examples](./examples)

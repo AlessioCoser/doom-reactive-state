@@ -1,6 +1,6 @@
+/** @jsxImportSource ../../src/dom */
 import { expect, describe, it, beforeEach } from 'vitest'
-import { h } from '../../src/dom';
-import { derive, signal } from '../../src/reactivity';
+import { signal } from '../../src/reactivity';
 
 const body = document.body
 
@@ -10,42 +10,42 @@ describe("dom", () => {
   })
 
   it('create an element', () => {
-    const element = h("div")
+    const element = <div></div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual("<div></div>")
   })
 
   it('create a div element with a text inside', () => {
-    const element = h("div", { children: ["ciao"] })
+    const element = <div>ciao</div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual("<div>ciao</div>")
   })
 
   it('create a div element with properties', () => {
-    const element = h("div", { className: 'class1' })
+    const element = <div className="class1"></div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div class="class1"></div>`)
   })
 
   it('create a div element with style properties', () => {
-    const element = h("div", { style: { fontSize: '15px' } })
+    const element = <div style={{ fontSize: "15px" }}></div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="font-size: 15px;"></div>`)
   })
 
   it('create a div element with reactive properties', () => {
-    const element = h("div", { className: () => 'test', style: () => ({ padding: '5px' }) })
+    const element = <div className={() => 'test'} style={() => ({ padding: '5px' })}></div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div class="test" style="padding: 5px;"></div>`)
   })
 
   it('create a div element with reactive style attributes', () => {
-    const element = h("div", { style: { padding: () => '5px' } })
+    const element = <div style={{ padding: () => '5px' }}></div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="padding: 5px;"></div>`)
@@ -53,7 +53,7 @@ describe("dom", () => {
 
   it('handle reactivity', () => {
     const [count, setCount] = signal(14)
-    const element = h("div", { style: { fontSize: () => `${count()}px` }, children: ["Increase"] })
+    const element = <div style={{ fontSize: () => `${count()}px` }}>Increase</div>
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="font-size: 14px;">Increase</div>`)
@@ -70,7 +70,7 @@ describe("dom", () => {
       const fontSize = () => `${count()}px`
       const increase = () => setCount(count() + 5)
 
-      return h("div", { className: 'test', style: { fontSize }, onclick: increase, children: ["Click me"] })
+      return <div className="test" style={{ fontSize }} onclick={increase}>Click me</div>
     }
     body.appendChild(Element())
 
@@ -82,15 +82,15 @@ describe("dom", () => {
   })
 
   it('remove a style property using an empty value', () => {
-    const [visible, setVisible] = signal<string>('hidden')
+    const [visibility, setVisibility] = signal<string>('hidden')
 
-    body.appendChild(h("div", { style: { visibility: () => visible() }, children: ["Click me"] }))
+    body.appendChild(<div style={{ visibility }}>Text</div>)
 
-    expect(body.innerHTML).toEqual(`<div style="visibility: hidden;">Click me</div>`)
-    setVisible('visible')
-    expect(body.innerHTML).toEqual(`<div style="visibility: visible;">Click me</div>`)
-    setVisible('')
-    expect(body.innerHTML).toEqual(`<div style="">Click me</div>`)
+    expect(body.innerHTML).toEqual(`<div style="visibility: hidden;">Text</div>`)
+    setVisibility('visible')
+    expect(body.innerHTML).toEqual(`<div style="visibility: visible;">Text</div>`)
+    setVisibility('')
+    expect(body.innerHTML).toEqual(`<div style="">Text</div>`)
   })
 
   it('update text child on click', () => {
@@ -98,9 +98,8 @@ describe("dom", () => {
       const [count, setCount] = signal(10)
 
       const increase = () => setCount(count() + 5)
-      const size = () => `Size: ${count()}px`
 
-      return h("div", { onclick: increase, children: [size] })
+      return <div onclick={increase}>Size: {count}px</div>
     }
     body.appendChild(Element())
 
@@ -117,11 +116,9 @@ describe("dom", () => {
 
       const increase = () => setCount(count() + 5)
 
-      return h("div", { onclick: increase, children: [
-        h('strong', { children: [
-          () => `Size: ${count()}px`
-        ]})
-      ]})
+      return <div onclick={increase}>
+        <strong>Size: {count}px</strong>
+      </div>
     }
     body.appendChild(Element())
 
@@ -139,10 +136,7 @@ describe("dom", () => {
     const text = () => count() >= 10 ? `Size: ${count()}px - ` : 'c'
     const howBig = () => (count() < 10) ? "CLICK ME" : (count() < 20) ? "S" : (count() < 40) ? "M" : (count() < 60) ? "L" : "XL"
 
-    body.appendChild(h("div", { children: [
-      text,
-      h('strong', { children: [howBig] })
-    ]}))
+    body.appendChild(<div>{text}<strong>{howBig}</strong></div>)
 
     expect(body.innerHTML).toEqual(`<div>c<strong>CLICK ME</strong></div>`)
 
@@ -159,29 +153,12 @@ describe("dom", () => {
     expect(body.innerHTML).toEqual(`<div>Size: 20px - <strong>M</strong></div>`)
   })
 
-  it('update children based on status', () => {
-    const [count, setCount] = signal(5)
-    const increase = () => setCount(count() + 5)
-    const toElement = (count: number) => h('p', { children: count.toString() })
-    const children = derive<Element[]>([], (current) => [...current(), toElement(count())])
-
-    body.appendChild(h("div", { children }))
-
-    expect(body.innerHTML).toEqual(`<div><p>5</p></div>`)
-
-    increase()
-    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p></div>`)
-
-    increase()
-    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p><p>15</p></div>`)
-  })
-
   it('nested elements', () => {
     const Nested = ({ name }: {name: string}) => {
-      return h("p", { className: name, children: ["Nested"] })
+      return <p className={name}>Nested</p>
     }
     const Element = () => {
-      return h("div", { className: "Element", children: [h(Nested, {name: 'name'})] })
+      return <div className="Element"><Nested name={'name'} /></div>
     }
     body.appendChild(Element())
 

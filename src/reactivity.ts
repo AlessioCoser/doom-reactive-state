@@ -45,8 +45,8 @@ export function derive<T>(a: unknown, b?: unknown): Accessor<T> {
   return get
 }
 
-type Accessor<T> = () => T
-type Setter<T> = (value: T) => void
+export type Accessor<T> = () => T
+export type Setter<T> = (value: T) => void
 export type Signal<T> = [Accessor<T>, Setter<T>]
 export function signal<T>(initial: T): Signal<T> {
   let _signal: T = initial

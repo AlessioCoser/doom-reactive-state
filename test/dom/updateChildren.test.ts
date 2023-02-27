@@ -1,3 +1,4 @@
+import { expect, describe, it, beforeEach } from 'vitest'
 import { updateChildren } from '../../src/dom/updateChildren'
 
 const body = document.body

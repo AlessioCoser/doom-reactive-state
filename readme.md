@@ -25,25 +25,48 @@ You can find some examples here: [./examples](./examples)
 
 ## Getting Started
 
-### With Node.js - only pure reactive state
+### TS - With TSX Components
+1. add jsx configurations on `tsconfig.json`
+```json
+{
+  "compilerOptions": {
+    ...
+    "jsx": "react-jsx",
+    "jsxImportSource": "doom-reactive-state/dom"
+  }
+}
+```
+2. create a `index.tsx` file
+```tsx
+import { Component, Accessor, effect, signal } from "doom-reactive-state";
 
-1. Create a file called index.js
-    ```javascript
-    const { signal, effect } = require("doom-reactive-state")
+type ButtonProps = {
+  text: Accessor<number>;
+  onClick: () => void
+};
+const Button: Component<ButtonProps> = ({ text, onClick }) => {
+  return (
+    <button onclick={onClick}>{text}</button>
+  );
+};
 
-    const [count, setCount] = signal(1)
+const App = () => {
+  const [count, setCount] = signal(1);
 
-    setInterval(() => setCount(count() + 1), 1000)
+  const increment = () => setCount(count() + 1);
 
-    effect(() => console.log(count()))
-    ```
-2. Run the file with node
-    ```
-    node index.js
-    ```
-3. You will see that every second the incremented number will be printed
+  return (
+    <div>
+      <h2>count {count}</h2>
+      <Button onClick={increment} text={count}></Button>
+    </div>
+  );
+};
 
-### With the reactive dom
+document.body.appendChild(App());
+```
+
+### JS - With h function (no JSX/TSX)
 
 This is a simple increment counter component
 ```javascript
@@ -66,6 +89,24 @@ function App() {
 document.body.appendChild(App())
 ```
 
+### With Node.js - only pure reactive state
+
+1. Create a file called index.js
+    ```javascript
+    const { signal, effect } = require("doom-reactive-state")
+
+    const [count, setCount] = signal(1)
+
+    setInterval(() => setCount(count() + 1), 1000)
+
+    effect(() => console.log(count()))
+    ```
+2. Run the file with node
+    ```
+    node index.js
+    ```
+3. You will see that every second the incremented number will be printed
+
 # Contributing
 
 ## Run Tests
@@ -74,7 +115,7 @@ npm test
 ```
 
 ## Run Dev
-this runs an application present in dev folder with parcel
+this runs an application present in dev folder with vite
 ```
 npm run dev
 ```

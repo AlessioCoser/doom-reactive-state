@@ -2,9 +2,7 @@
   "name": "doom-reactive-state",
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "test": "vitest",
-    "dev": "cd dev && npm start",
-    "release": "npm run build && ./publishing/publish.sh $1"
+    "test": "vitest"
   },
   "author": "Alessio Coser",
   "license": "MIT",

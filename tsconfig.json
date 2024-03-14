@@ -19,8 +19,6 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "allowJs": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "src/dom",
     "outDir": "dist"
   },
   "include": ["src"]

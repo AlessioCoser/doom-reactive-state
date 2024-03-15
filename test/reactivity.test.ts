@@ -1,7 +1,5 @@
 import { expect, describe, it } from "vitest";
-import { signal, effect } from "../src/reactivity";
-
-const context = [];
+import { signal, effect, derive } from "../src/reactivity";
 
 describe("reactivity", () => {
   it("get the initial value", () => {
@@ -41,4 +39,19 @@ describe("reactivity", () => {
 
     expect(get()).toEqual(10);
   });
+
+  it('derived signal', () => {
+    let derivedComputations: number = 0;
+    const [get, set] = signal(1)
+
+    const derived = derive(() => {
+      derivedComputations++;
+      return get() * 2
+    })
+
+    expect(derived()).toEqual(2)
+    set(8)
+    expect(derived()).toEqual(16)
+    expect(derivedComputations).toEqual(2)
+  })
 });

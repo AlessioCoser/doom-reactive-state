@@ -13,7 +13,11 @@ export function signal<T>(initial: T): Signal<T> {
     },
     function setter(value: T) {
       _value = value;
-      subscriptions.forEach((ctx) => ctx.execute());
+      subscriptions.forEach((subscribedContext) => {
+        if (subscribedContext !== runningContext) {
+          subscribedContext.execute();
+        }
+      });
     },
   ];
 }

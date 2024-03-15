@@ -38,7 +38,7 @@ export function effect(fn: () => void) {
 }
 
 export function derive<T>(initial: T, fn: Derivation<T>): Accessor<T> {
-  let derived: T = initial;
-  effect(() => (derived = fn(derived)));
-  return () => derived;
+  const [getDerived, setDerived] = signal(initial);
+  effect(() => setDerived(fn(getDerived())));
+  return getDerived;
 }

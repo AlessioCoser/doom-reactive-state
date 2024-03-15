@@ -83,4 +83,17 @@ describe("reactivity", () => {
     set(7);
     expect(history()).toEqual([7, 5, 2]);
   });
+
+  it("effect on a derived signal should work as a signal", () => {
+    const calls: number[] = [];
+    const [get, set] = signal(1);
+    const multiply = derive<number>(0, () => get() * 2);
+
+    effect(() => calls.push(multiply()));
+
+    set(5);
+    set(7);
+
+    expect(calls).toEqual([2, 10, 14]);
+  });
 });

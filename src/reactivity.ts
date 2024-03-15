@@ -1,16 +1,34 @@
-type Accessor<T> = () => T
-type Setter<T> = (value: T) => void
-type Signal<T> = [Accessor<T>, Setter<T>]
+import { Context, Signal } from "./types";
+
+let runningContext: Context | null = null;
+
 export function signal<T>(initial: T): Signal<T> {
-  let _value: T = initial
+  let _value: T = initial;
+  const subscriptions = new Set<Context>();
 
-  function accessor() {
-    return _value
-  }
+  return [
+    function accessor() {
+      if (runningContext) subscriptions.add(runningContext);
+      return _value;
+    },
+    function setter(value: T) {
+      _value = value;
+      subscriptions.forEach((ctx) => ctx.execute());
+    },
+  ];
+}
 
-  function setter(value: T) {
-    _value = value
-  }
+export function effect(fn: () => void) {
+  const running = {
+    execute() {
+      runningContext = this;
+      try {
+        fn();
+      } finally {
+        runningContext = null;
+      }
+    },
+  };
 
-  return [accessor, setter]
+  running.execute();
 }

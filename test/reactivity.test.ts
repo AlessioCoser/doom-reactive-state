@@ -1,5 +1,7 @@
 import { expect, describe, it } from 'vitest'
-import { signal } from "../src/reactivity"
+import { signal, effect } from "../src/reactivity"
+
+const context = [];
 
 describe('reactivity', () => {
   it('get the initial value', () => {
@@ -15,5 +17,19 @@ describe('reactivity', () => {
     set(1)
 
     expect(get()).toEqual(1)
+  })
+
+  it('register for a value change', () => {
+    const calls: number[] = []
+    const [get, set] = signal(0)
+
+    effect(() => calls.push(get()))
+    set(1)
+    set(2)
+    set(3)
+    set(4)
+    set(5)
+
+    expect(calls).toEqual([0, 1, 2, 3, 4, 5])
   })
 })

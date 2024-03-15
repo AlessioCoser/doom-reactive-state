@@ -1,4 +1,4 @@
-import { Context, Signal, Accessor } from "./types";
+import { Context, Signal, Accessor, Derivation } from "./types";
 
 let runningContext: Context | null = null;
 
@@ -37,8 +37,8 @@ export function effect(fn: () => void) {
   running.execute();
 }
 
-export function derive<T>(fn: () => Exclude<T, void>): Accessor<T> {
-  let derived: T | null = null
-  effect(() => derived = fn());
-  return () => derived!!;
+export function derive<T>(initial: T, fn: Derivation<T>): Accessor<T> {
+  let derived: T = initial;
+  effect(() => (derived = fn(derived)));
+  return () => derived;
 }

@@ -40,36 +40,47 @@ describe("reactivity", () => {
     expect(get()).toEqual(10);
   });
 
-  it('derived signal', () => {
+  it("derived signal", () => {
     let derivedComputations: number = 0;
-    const [get, set] = signal(1)
+    const [get, set] = signal(1);
 
-    const derived = derive(() => {
+    const derived = derive<number>(0, () => {
       derivedComputations++;
-      return get() * 2
-    })
+      return get() * 2;
+    });
 
-    expect(derived()).toEqual(2)
-    set(8)
-    expect(derived()).toEqual(16)
-    expect(derivedComputations).toEqual(2)
-  })
+    expect(derived()).toEqual(2);
+    set(8);
+    expect(derived()).toEqual(16);
+    expect(derivedComputations).toEqual(2);
+  });
 
-  it('derived with multiple signals', () => {
+  it("derived with multiple signals", () => {
     let derivedComputations: number = 0;
-    const [first, setFirst] = signal(2)
-    const [second, setSecond] = signal(2)
+    const [first, setFirst] = signal(2);
+    const [second, setSecond] = signal(2);
 
-    const multiple = derive(() => {
+    const multiple = derive<number>(0, () => {
       derivedComputations++;
-      return first() * second()
-    })
+      return first() * second();
+    });
 
-    expect(multiple()).toEqual(4)
-    setFirst(5)
-    expect(multiple()).toEqual(10)
-    setSecond(3)
-    expect(multiple()).toEqual(15)
-    expect(derivedComputations).toEqual(3)
-  })
+    expect(multiple()).toEqual(4);
+    setFirst(5);
+    expect(multiple()).toEqual(10);
+    setSecond(3);
+    expect(multiple()).toEqual(15);
+    expect(derivedComputations).toEqual(3);
+  });
+
+  it("updating the derived signal based on it's previous value", () => {
+    const [get, set] = signal(2);
+    const history = derive<number[]>([], (current) => [get(), ...current]);
+
+    expect(history()).toEqual([2]);
+    set(5);
+    expect(history()).toEqual([5, 2]);
+    set(7);
+    expect(history()).toEqual([7, 5, 2]);
+  });
 });

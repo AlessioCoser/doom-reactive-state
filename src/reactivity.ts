@@ -1,39 +1,42 @@
-import { Context, Signal, Accessor, Derivation } from "./types";
+import { Context, Signal, Accessor, Setter, Derivation } from "./types";
 
-let runningContext: Context | null = null;
+let currentSubscriber: Context | null = null;
 
-export function signal<T>(initial: T): Signal<T> {
+export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
+  const s = _signal(initial)
+  return [s.get.bind(s), s.set.bind(s)]
+}
+function _signal<T>(initial: T): Signal<T> {
   let _value: T = initial;
   const subscriptions = new Set<Context>();
 
-  return [
-    function accessor() {
-      if (runningContext) subscriptions.add(runningContext);
+  return {
+    get() {
+      if (currentSubscriber) subscriptions.add(currentSubscriber);
       return _value;
     },
-    function setter(value: T) {
+    set(value: T) {
       _value = value;
-      subscriptions.forEach((subscribedContext) => {
-        if (subscribedContext !== runningContext) {
-          subscribedContext.execute();
+      subscriptions.forEach((subscriber) => {
+        if (subscriber !== currentSubscriber) {
+          subscriber.execute();
         }
       });
     },
-  ];
+  };
 }
 
 export function effect(fn: () => void) {
   const running = {
     execute() {
-      runningContext = this;
+      currentSubscriber = this;
       try {
         fn();
       } finally {
-        runningContext = null;
+        currentSubscriber = null;
       }
     },
   };
-
   running.execute();
 }
 

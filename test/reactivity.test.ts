@@ -57,12 +57,12 @@ describe("reactivity", () => {
 
   it("derived with multiple signals", () => {
     let derivedComputations: number = 0;
-    const [first, setFirst] = signal(2);
-    const [second, setSecond] = signal(2);
+    const [getFirst, setFirst] = signal(2);
+    const [getSecond, setSecond] = signal(2);
 
     const multiple = derive<number>(0, () => {
       derivedComputations++;
-      return first() * second();
+      return getFirst() * getSecond();
     });
 
     expect(multiple()).toEqual(4);

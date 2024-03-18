@@ -96,4 +96,48 @@ describe("reactivity", () => {
 
     expect(calls).toEqual([2, 10, 14]);
   });
+
+  it('execute only once the effect that uses both original and derived signals', () => {
+    const calls1: string[] = []
+    const callsDerived: number[] = []
+    const [getSig0, setSig0] = signal(0)
+    const sig1 = derive<number>(0, () => {
+      const val = getSig0() * 2
+      callsDerived.push(val)
+      return val
+    })
+
+    effect(() => calls1.push(`${getSig0()} ${sig1()}`))
+
+    setSig0(1)
+
+    expect(sig1()).toEqual(2)
+    expect(callsDerived).toEqual([0, 2])
+    expect(calls1).toEqual(['0 0', '1 2'])
+  })
+
+  it('execute only once the effect that uses both original and the derivation of another derivation', () => {
+    const calls1: string[] = []
+    const calls2: number[] = []
+    const calls3: number[] = []
+    const calls4: number[] = []
+    const [getSig0, setSig0] = signal(0)
+    const sig1 = derive<number>(0, () => getSig0() * 2)
+    const sig2 = derive<number>(0, () => sig1() + 1)
+
+    effect(() => calls1.push(`${getSig0()} ${sig2()}`))
+    effect(() => calls2.push(getSig0()))
+    effect(() => calls3.push(sig1()))
+    effect(() => calls4.push(sig2()))
+    setSig0(1)
+    setSig0(2)
+    setSig0(3)
+    setSig0(4)
+    setSig0(5)
+
+    expect(calls2).toEqual([0, 1, 2, 3, 4, 5])
+    expect(calls3).toEqual([0, 2, 4, 6, 8, 10])
+    expect(calls4).toEqual([1, 3, 5, 7, 9, 11])
+    expect(calls1).toEqual(['0 1', '1 3', '2 5', '3 7', '4 9', '5 11'])
+  })
 });

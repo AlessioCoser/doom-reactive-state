@@ -1,47 +1,42 @@
-import { Context, Signal, Accessor, Setter, Derivation } from "./types";
+import { Signal, Accessor, Setter, Derivation } from "./types";
+import { Subscriptions } from "./Subscriptions";
 
-let currentSubscriber: Context | null = null;
+const subscriptions = new Subscriptions();
 
 export function signal<T>(initial: T): [Accessor<T>, Setter<T>] {
-  const s = _signal(initial)
-  return [s.get.bind(s), s.set.bind(s)]
+  const s = _createSignal(initial);
+  return [s.get.bind(s), s.set.bind(s)];
 }
-function _signal<T>(initial: T): Signal<T> {
+function _createSignal<T>(initial: T): Signal<T> {
   let _value: T = initial;
-  const subscriptions = new Set<Context>();
 
   return {
-    get() {
-      if (currentSubscriber) subscriptions.add(currentSubscriber);
+    get(this: Signal<T>) {
+      subscriptions.subscribeTo(this);
       return _value;
     },
-    set(value: T) {
+    set(this: Signal<T>, value: T) {
       _value = value;
-      subscriptions.forEach((subscriber) => {
-        if (subscriber !== currentSubscriber) {
-          subscriber.execute();
-        }
-      });
+      subscriptions.executeAllSubscriptionsTo(this);
     },
   };
 }
 
 export function effect(fn: () => void) {
+  return _createEffect(fn);
+}
+function _createEffect(fn: () => void, derived: Signal<any> | null = null) {
   const running = {
+    derived,
     execute() {
-      currentSubscriber = this;
-      try {
-        fn();
-      } finally {
-        currentSubscriber = null;
-      }
+      subscriptions.run(this, fn)
     },
   };
   running.execute();
 }
 
 export function derive<T>(initial: T, fn: Derivation<T>): Accessor<T> {
-  const [getDerived, setDerived] = signal(initial);
-  effect(() => setDerived(fn(getDerived())));
-  return getDerived;
+  const derived = _createSignal(initial);
+  _createEffect(() => derived.set(fn(derived.get())), derived);
+  return derived.get.bind(derived);
 }

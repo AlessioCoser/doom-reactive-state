@@ -1,6 +1,6 @@
-import { Tree } from "./utils/Tree";
-import { TreeSet } from "./utils/TreeSet";
-import { Subscriber, Signal } from "./types";
+import { Tree } from "./Tree";
+import { TreeSet } from "./TreeSet";
+import { Subscriber, Signal } from "../types";
 
 export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;

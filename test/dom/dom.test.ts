@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeEach } from 'vitest'
-import { h } from '../../src/dom';
+import { Div, P, h } from '../../src/dom';
 import { derive, signal } from '../../src/reactivity';
 
 const body = document.body
@@ -181,7 +181,19 @@ describe("dom", () => {
       return h("p", { className: name, children: ["Nested"] })
     }
     const Element = () => {
-      return h("div", { className: "Element", children: [h(Nested, {name: 'name'})] })
+      return h("div", { className: "Element", children: [Nested({name: 'name'})] })
+    }
+    body.appendChild(Element())
+
+    expect(body.innerHTML).toEqual(`<div class="Element"><p class="name">Nested</p></div>`)
+  })
+
+  it('use html components', () => {
+    const Nested = ({ name }: {name: string}) => {
+      return P({ className: name, children: ["Nested"] })
+    }
+    const Element = () => {
+      return Div({ className: "Element", children: [Nested({name: 'name'})]})
     }
     body.appendChild(Element())
 

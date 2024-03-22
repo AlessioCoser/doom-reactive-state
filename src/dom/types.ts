@@ -1,4 +1,4 @@
-export type DoomComponent<P = {}> = (props: P) => Element
+export type Component<P = {}> = (props: P) => Element
 export type Children = Reactive<Child[] | Child>
 export type Child = Element | Reactive<string>
 export type Reactive<T> = T | (() => T)

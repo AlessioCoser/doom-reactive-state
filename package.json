@@ -2,6 +2,7 @@
   "name": "doom-reactive-state",
   "scripts": {
     "build": "rm -rf dist && tsc",
+    "dev": "cd dev && npm start",
     "test": "vitest"
   },
   "author": "Alessio Coser",

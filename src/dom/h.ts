@@ -1,12 +1,12 @@
 import { effect } from "../reactivity"
-import { Child, Children, DoomComponent, DoomProperties, DoomProperty, Reactive, Style, Styles } from "./types"
+import { Child, Children, Component, DoomProperties, DoomProperty, Reactive, Style, Styles } from "./types"
 import { updateChildren } from './updateChildren'
 
-export function h<P>(component: DoomComponent<P>, props?: P): Element
+export function h<P>(component: Component<P>, props?: P): Element
 export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: DoomProperties<K>): Element
 export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): Element {
   if (typeof component === 'function') {
-    return (component as DoomComponent<P>)(props as P)
+    return (component as Component<P>)(props as P)
   }
 
   const el: HTMLElementTagNameMap[K] = document.createElement(component as K)

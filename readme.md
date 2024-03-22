@@ -14,74 +14,33 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 
 ## Features
 1. Zero dependencies
-2. Just a few lines of code
-3. Super-Easy reactive concepts (signal, effect, derived)
+2. No compilation required
+3. Super-Easy reactive concepts (signal, effect, derive)
 4. No magic, you create components that are simple HTMLElements
-5. Only a single HTMLElement wrapper to enable reactivity on Element properties
+5. Just a few lines of code
+6. Only a single HTMLElement wrapper to enable reactivity on Element properties
+7. HtmlElement wrappers to easily use the standard html elements as reactive components
 
 ## Examples
 You can find some examples here: [./examples](./examples)
 
 ## Getting Started
 
-### TS - With TSX Components
-1. add jsx configurations on `tsconfig.json`
-```json
-{
-  "compilerOptions": {
-    ...
-    "jsx": "react-jsx",
-    "jsxImportSource": "doom-reactive-state/dom"
-  }
-}
-```
-2. create a `index.tsx` file
-```tsx
-import { Component, Accessor, effect, signal } from "doom-reactive-state";
-
-type ButtonProps = {
-  text: Accessor<number>;
-  onClick: () => void
-};
-const Button: Component<ButtonProps> = ({ text, onClick }) => {
-  return (
-    <button onclick={onClick}>{text}</button>
-  );
-};
-
-const App = () => {
-  const [count, setCount] = signal(1);
-
-  const increment = () => setCount(count() + 1);
-
-  return (
-    <div>
-      <h2>count {count}</h2>
-      <Button onClick={increment} text={count}></Button>
-    </div>
-  );
-};
-
-document.body.appendChild(App());
-```
-
-### JS - With h function (no JSX/TSX)
-
 This is a simple increment counter component
 ```javascript
-const { signal, h } = require("doom-reactive-state")
+const { signal, Div, H2, Span, Button } = require("doom-reactive-state")
 
 function App() {
   const [count, setCount] = signal(1)
 
   const onclick = () => setCount(count() + 1)
 
-  return h("div", { children: [
-    h("h2", { children: [
+  return Div({ children: [
+    H2({ children: [
       "Count: ",
-      h('span', { children: [() => `${count()}`] })
+      Span({ children: [() => `${count()}`] })
     ]}),
-    h("button", { onclick, children: ['increment'] }),
+    Button({ onclick, children: ['increment'] }),
   ]})
 }
 

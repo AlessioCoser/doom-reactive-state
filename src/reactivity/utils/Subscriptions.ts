@@ -1,11 +1,11 @@
 import { Tree } from "./Tree";
 import { TreeSet } from "./TreeSet";
-import { Subscriber, Signal } from "../types";
+import { Subscriber, _Signal } from "../types";
 
 export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;
-  private derivations = new Tree<Signal<any>, Signal<any>>();
-  private subscriptions = new Tree<Signal<any>, Subscriber>();
+  private derivations = new Tree<_Signal<any>, _Signal<any>>();
+  private subscriptions = new Tree<_Signal<any>, Subscriber>();
 
   run(subscriber: Subscriber, fn: () => void): void {
     this.currentSubscriber = subscriber;
@@ -16,7 +16,7 @@ export class Subscriptions {
     }
   }
 
-  subscribeTo(signal: Signal<any>): void {
+  subscribeTo(signal: _Signal<any>): void {
     const subscriber = this.currentSubscriber;
     if (!signal || !subscriber || signal === subscriber.derived) {
       return;
@@ -25,11 +25,11 @@ export class Subscriptions {
     this.derivations.addTo(signal, subscriber.derived);
   }
 
-  executeAllSubscriptionsTo(signal: Signal<any> | null) {
+  executeAllSubscriptionsTo(signal: _Signal<any> | null) {
     this._subscriptionsTo(signal).forEach((subscriber) => subscriber.execute());
   }
 
-  private _subscriptionsTo(signal: Signal<any> | null): TreeSet<Subscriber> {
+  private _subscriptionsTo(signal: _Signal<any> | null): TreeSet<Subscriber> {
     if (!signal) {
       return new TreeSet();
     }

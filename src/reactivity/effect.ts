@@ -1,4 +1,4 @@
-import { Signal, Subscriber } from "./types";
+import { _Signal, Subscriber } from "./types";
 import { subscriptions } from "./subscriptions";
 
 export function effect(fn: () => void) {
@@ -6,7 +6,7 @@ export function effect(fn: () => void) {
 }
 export function _createEffect(
   fn: () => void,
-  derived: Signal<any> | null = null
+  derived: _Signal<any> | null = null
 ) {
   const running: Subscriber = {
     derived,

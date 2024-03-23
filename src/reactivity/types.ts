@@ -1,4 +1,4 @@
-export type Derivation<T> = (previous: T) => Exclude<T, void>;
+export type Derivation<T> = (previous: T) => T;
 export type Accessor<T> = () => T;
 export type Setter<T> = (value: T) => void;
 export type _Signal<T> = { get: Accessor<T>; set: Setter<T> };

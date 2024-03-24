@@ -1,5 +1,5 @@
-import { effect, derive, signal, h, H2, Div, P, Button } from 'doom-reactive-state'
-import { Signal } from 'doom-reactive-state/reactivity/types'
+import { Button, Div, H2, P, derive, effect, h, signal } from "doom-reactive-state"
+import { Signal } from "doom-reactive-state/dist/types/reactivity/types"
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -9,7 +9,7 @@ const Main = ({ counter }: MainProps) => {
   const [btnText, setBtnText] = signal('initial text')
   const [isLoading, setIsLoading] = signal(false)
   // we can use a derived signal and maintain the state in sync
-  const doubledText = derive<string>('', () => `doubled is: ${count() * 2}`)
+  const doubledText = derive('', () => `doubled is: ${count() * 2}`)
   // we can also edit or update the derived signal (like adding an element to an array)
   const history = derive<number[]>([], (h) => [count(), ...h])
 

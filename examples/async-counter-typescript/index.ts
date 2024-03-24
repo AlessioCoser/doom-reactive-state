@@ -1,5 +1,5 @@
 import { Button, Div, H2, P, derive, effect, h, signal } from "doom-reactive-state"
-import { Signal } from "doom-reactive-state/dist/types/reactivity/types"
+import { Signal } from "doom-reactive-state/reactivity/types"
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {

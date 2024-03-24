@@ -5,6 +5,8 @@
     "module": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "Node",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "strict": true,
     "sourceMap": false,
     "resolveJsonModule": true,
@@ -12,14 +14,14 @@
     "esModuleInterop": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "declaration": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "allowJs": false,
-    "outDir": "dist"
+    "allowJs": false
   },
   "include": ["src"]
 }

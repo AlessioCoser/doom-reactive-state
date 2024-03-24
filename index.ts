@@ -1,7 +1,7 @@
-import { Button, Div, H2 } from "../src/dom";
-import { Children, Component } from "../src/dom/types";
-import { derive, effect, signal } from "../src/reactivity";
-import { Accessor } from "../src/reactivity/types";
+import { Button, Div, H2 } from "./src/dom";
+import { Children, Component } from "./src/dom/types";
+import { derive, effect, signal } from "./src/reactivity";
+import { Accessor } from "./src/reactivity/types";
 
 type ButtonProps = {
   size: Accessor<number>;

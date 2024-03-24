@@ -1,11 +1,18 @@
 {
   "name": "doom-reactive-state",
   "repository":"https://github.com/AlessioCoser/doom-reactive-state",
-  "type": "commonjs",
+  "type": "module",
   "version": "%VERSION%",
   "description": "",
-  "main": "index.js",
-  "types": "types.d.ts",
+  "main": "./doom-reactive-state.umd.js",
+  "module": "./doom-reactive-state.js",
+  "types": "./doom-reactive-state.d.ts",
   "author": "Alessio Coser",
-  "license": "MIT"
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./doom-reactive-state.js",
+      "require": "./doom-reactive-state.umd.js"
+    }
+  }
 }

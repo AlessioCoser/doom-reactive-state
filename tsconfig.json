@@ -3,6 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "esnext",
     "moduleResolution": "Node",
     "strict": true,
     "sourceMap": false,
@@ -16,7 +17,9 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "allowJs": false
+    "declaration": true,
+    "allowJs": false,
+    "outDir": "dist",
   },
   "include": ["src"]
 }

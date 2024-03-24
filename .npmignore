@@ -1,0 +1,7 @@
+*-e
+node_modules
+dist
+build
+.DS_Store
+.parcel-cache
+coverage

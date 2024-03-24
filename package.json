@@ -1,7 +1,7 @@
 {
   "name": "doom-reactive-state",
-  "main": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "type": "module",
   "version": "%VERSION%",
   "description": "",
@@ -9,7 +9,7 @@
     "test": "vitest",
     "coverage": "vitest --coverage",
     "dev": "vite",
-    "build": "rm -rf dist && tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
+    "build": "rm -rf dist && tsc",
     "release": "npm run build && ./publish.sh $1"
   },
   "author": "Alessio Coser",
@@ -21,14 +21,5 @@
     "typescript": "^5.4.3",
     "vite": "^4.1.4",
     "vitest": "^1.4.0"
-  },
-  "exports": {
-    "./*": {
-      "types": "./dist/types/index.d.ts",
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.js",
-      "default": "./dist/esm/index.js"
-    }
-  },
-  "files": ["./dist"]
+  }
 }

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-sed -i'' -e "s|\"version\": \"%VERSION%\",|\"version\": \"$1\",|" "$(pwd)/package.json"
+cp "$(pwd)/package.json" "$(pwd)/dist/"
+cp "$(pwd)/.npmignore" "$(pwd)/dist/"
+cp "$(pwd)/readme.md" "$(pwd)/dist/"
+sed -i'' -e "s|%VERSION%|$1|" "$(pwd)/dist/package.json"
+cd $(pwd)/dist/
 echo "... Publishing version $1 ..."
 npm publish
-sed -i'' -e "s|\"version\": \"$1\",|\"version\": \"%VERSION%\",|" "$(pwd)/package.json"

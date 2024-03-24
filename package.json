@@ -1,7 +1,8 @@
 {
   "name": "doom-reactive-state",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "type": "module",
   "version": "%VERSION%",
   "description": "",
@@ -9,7 +10,7 @@
     "test": "vitest",
     "coverage": "vitest --coverage",
     "dev": "vite",
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist && tsup ./src",
     "release": "npm run build && ./publish.sh $1"
   },
   "author": "Alessio Coser",
@@ -18,8 +19,14 @@
     "@types/jsdom": "^21.1.0",
     "@vitest/coverage-v8": "^1.4.0",
     "jsdom": "^21.1.0",
+    "tsup": "^8.0.2",
     "typescript": "^5.4.3",
     "vite": "^4.1.4",
     "vitest": "^1.4.0"
+  },
+  "exports": {
+    "require": "./index.cjs",
+    "import": "./index.js",
+    "types": "./index.d.ts"
   }
 }

@@ -28,7 +28,7 @@ You can find some examples here: [./examples](./examples)
 
 This is a simple increment counter component
 ```javascript
-import { signal, Div, H2, Span, Button } from 'doom-reactive-state'
+const { signal, Div, H2, Span, Button } = require("doom-reactive-state")
 
 function App() {
   const [count, setCount] = signal(1)
@@ -46,6 +46,25 @@ function App() {
 
 document.body.appendChild(App())
 ```
+
+### With Node.js - only pure reactive state
+
+1. Create a file called index.js
+    ```javascript
+    const { signal, effect } = require("doom-reactive-state")
+
+    const [count, setCount] = signal(1)
+
+    setInterval(() => setCount(count() + 1), 1000)
+
+    effect(() => console.log(count()))
+    ```
+2. Run the file with node
+    ```
+    node index.js
+    ```
+3. You will see that every second the incremented number will be printed
+
 
 # Contributing
 

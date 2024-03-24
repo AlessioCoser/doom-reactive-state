@@ -1,4 +1,4 @@
-import { signal, h, Div, H2, Button, derive } from 'doom-reactive-state'
+const { signal, derive, Div, H2, h, Button } = require("doom-reactive-state")
 
 const App = () => {
   // this is a non-reactive component it's out of the renderer loop since it isn't wrapped with the `effect` function

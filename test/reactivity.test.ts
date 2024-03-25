@@ -56,9 +56,10 @@ describe("reactivity", () => {
   });
 
   it("derived signal with a template literal", () => {
+    const px = "px"
     const [get, set] = signal(1);
 
-    const derived = d`${get}px`
+    const derived = d`${get}${px}`
 
     expect(derived()).toEqual('1px');
     set(8);

@@ -25,14 +25,11 @@ export class Subscriptions {
     this.derivations.addTo(signal, subscriber.derived);
   }
 
-  executeAllSubscriptionsTo(signal: _Signal<any> | null) {
+  executeAllSubscriptionsTo(signal: _Signal<any>) {
     this._subscriptionsTo(signal).forEach((subscriber) => subscriber.execute());
   }
 
-  private _subscriptionsTo(signal: _Signal<any> | null): TreeSet<Subscriber> {
-    if (!signal) {
-      return new TreeSet();
-    }
+  private _subscriptionsTo(signal: _Signal<any>): TreeSet<Subscriber> {
     const derivedSubscriptions = this.derivations
       .get(signal)
       .flatMap((derived) => this.derivations.get(derived).add(derived))

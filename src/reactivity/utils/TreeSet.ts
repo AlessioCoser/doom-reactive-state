@@ -5,10 +5,6 @@ export class TreeSet<T> {
     this._set = new Set(arr);
   }
 
-  get size() {
-    return this._set.size;
-  }
-
   has(value: T): boolean {
     return this._set.has(value);
   }

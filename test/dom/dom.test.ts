@@ -1,6 +1,5 @@
 import { expect, describe, it, beforeEach } from 'vitest'
-import { Div, P, h } from '../../src/dom';
-import { d, derive, signal } from '../../src/reactivity';
+import { Div, P, h, d, derive, signal  } from '../../src';
 
 const body = document.body
 
@@ -21,6 +20,17 @@ describe("dom", () => {
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual("<div>ciao</div>")
+  })
+
+  it('create a div with a single reactive child', () => {
+    const [greet, setGreet] = signal("ciao")
+
+    const element = h("div", d`${greet}`)
+    body.appendChild(element)
+
+    expect(body.innerHTML).toEqual("<div>ciao</div>")
+    setGreet("Hola!")
+    expect(body.innerHTML).toEqual("<div>Hola!</div>")
   })
 
   it('create a div element with properties', () => {

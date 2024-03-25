@@ -1,4 +1,4 @@
-import { Button, Div, H2, P, derive, effect, h, signal } from "doom-reactive-state"
+import { Button, Div, H2, H3, P, Strong, d, derive, effect, h, signal } from "doom-reactive-state"
 import { Signal } from "doom-reactive-state/reactivity/types"
 
 type MainProps = { counter: Signal<number> }
@@ -10,6 +10,7 @@ const Main = ({ counter }: MainProps) => {
   const [isLoading, setIsLoading] = signal(false)
   // we can use a derived signal and maintain the state in sync
   const doubledText = derive('', () => `doubled is: ${count() * 2}`)
+  const half = derive(0, () => count() / 2)
   // we can also edit or update the derived signal (like adding an element to an array)
   const history = derive<number[]>([], (h) => [count(), ...h])
 
@@ -27,27 +28,35 @@ const Main = ({ counter }: MainProps) => {
     })
   }
 
-  const onButtonClick = async () => {
+  const onclick = async () => {
     setIsLoading(true)
     await asyncOperation()
     setCount(count() + 1)
     setIsLoading(false)
   }
 
-  return h("div", { children: [
+  // h is a generic function to create a reactive HTMLElement.
+  // we can also use wrappers for the most common tags like H1, H2, ..., Div, P ...
+  return h("div", [
     // only functions inside objects are binded
     // all computed properties must be functions
-    H2({ children: [() => `count ${count()}`]}),
-    // you can use text accessor as reactive text children
+    H2(() => `count ${count()}`),
+    // we can also use the tagged template function 'd' to create a string deriveation in place.
+    // in the tagged template function the signal must not be evaluated, otherwise it will not react on changes
+    Div(d`half is: ${half}`),
+    // we can also use text accessor as reactive text children
     doubledText,
-    P({ children: [
-      // you can avoid the element reacting for a specific property: see children property, we pass it directly without any function
+    P([
+      // we can avoid the element reacting for a specific property. we can pass the string directly without any function
+      Div(`Initial Text ${btnText()}`),
       // but since the state accessor is a function you can pass it directly and still react to it's change like isLoading
-      Button({ style: { display: 'block' }, disabled: isLoading, onclick: onButtonClick, children: [`button ${btnText()}`] }),
+      Button({ style: { display: 'block' }, disabled: isLoading, onclick }, `increase`),
+      // wrapping in a function it will react to the btnText change
+      Div(() => `Updated Text ${btnText()}`),
       // children array can also be reactive when wrapped in a function
-      Div({ children: () => history().map((it) => h("p", { children: [it.toString()] })) })
-    ]})
-  ]})
+      Div(() => history().map((it) => h("p", it.toString())))
+    ])
+  ])
 }
 
 const App = () => {

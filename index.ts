@@ -1,4 +1,4 @@
-import { Button, Div, H2 } from "./src/dom";
+import { Button, Div, H1, H2 } from "./src/dom";
 import { Component } from "./src/dom/types";
 import { d, effect, signal } from "./src/reactivity";
 import { Accessor } from "./src/reactivity/types";
@@ -44,7 +44,8 @@ const App = () => {
   };
 
   return Div([
-    H2(d`Size ${size}`),
+    H1("Static Text"),
+    H2(d`String derivation. This will update the signal size to "${size}"`),
     MyButton({ onButtonClick, size }, d`button ${text}`),
   ]);
 };

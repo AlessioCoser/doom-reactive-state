@@ -1,5 +1,5 @@
 import { expect, describe, it } from "vitest";
-import { signal, effect, derive } from "../src/reactivity";
+import { signal, effect, derive, d } from "../src/reactivity";
 
 describe("reactivity", () => {
   it("get the initial value", () => {
@@ -53,6 +53,16 @@ describe("reactivity", () => {
     set(8);
     expect(derived()).toEqual(16);
     expect(derivedComputations).toEqual(2);
+  });
+
+  it("derived signal with a template literal", () => {
+    const [get, set] = signal(1);
+
+    const derived = d`${get}px`
+
+    expect(derived()).toEqual('1px');
+    set(8);
+    expect(derived()).toEqual('8px');
   });
 
   it("derived with multiple signals", () => {

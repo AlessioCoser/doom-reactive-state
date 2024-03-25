@@ -1,16 +1,11 @@
 import { effect } from "../reactivity"
-import { Child, Children, Component, DoomProperties, DoomProperty, Reactive, Style, Styles } from "./types"
+import { Child, Children, DoomProperties, DoomProperty, Reactive, Style, Styles } from "./types"
 import { updateChildren } from './updateChildren'
 
-export function h<P>(component: Component<P>, props?: P): Element
-export function h<K extends keyof HTMLElementTagNameMap>(component: K, props?: DoomProperties<K>): Element
-export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, props: unknown = {}): Element {
-  if (typeof component === 'function') {
-    return (component as Component<P>)(props as P)
-  }
-
+export function h<K extends keyof HTMLElementTagNameMap>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element {
+  const { props, children } = prepare(a, b)
   const el: HTMLElementTagNameMap[K] = document.createElement(component as K)
-  const { children, ...properties} = props as DoomProperties<K>
+  const { ...properties} = props as DoomProperties<K>
 
   toProperties(properties as DoomProperties<K>).forEach(({key, value}) => {
     if (key === 'style') {
@@ -31,7 +26,7 @@ export function h<P, K extends keyof HTMLElementTagNameMap>(component: unknown, 
     effect(() => { el[key] = evaluate(value) })
   })
 
-  addChildren(el, children)
+  addChildren(el, children as Children)
 
   return el
 }
@@ -92,3 +87,20 @@ function toChildNode(child: Child): ChildNode {
 
 const pass = <T>(prop: Reactive<T>): T => prop as T
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== 'function' ? prop : (prop as Function)()
+
+function prepare<K extends keyof HTMLElementTagNameMap>(a: unknown, b: unknown) {
+  if(!a && !b) {
+    return { props: {} as DoomProperties<K>, children: [] as Children}
+  }
+
+  if(!b) {
+    if(Array.isArray(a) || typeof a === "function" || typeof a === "string") {
+      return { props: {} as DoomProperties<K>, children: a as Children}
+    } else {
+      return { props: a as DoomProperties<K>, children: [] as Children}
+    }
+  }
+
+  return { props: a as DoomProperties<K>, children: b as Children}
+}
+

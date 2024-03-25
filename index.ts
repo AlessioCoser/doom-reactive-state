@@ -1,20 +1,15 @@
 import { Button, Div, H2 } from "./src/dom";
-import { Children, Component } from "./src/dom/types";
-import { derive, effect, signal } from "./src/reactivity";
+import { Component } from "./src/dom/types";
+import { d, effect, signal } from "./src/reactivity";
 import { Accessor } from "./src/reactivity/types";
 
 type ButtonProps = {
   size: Accessor<number>;
   onButtonClick: () => void;
-  children: Children;
 };
-const MyButton: Component<ButtonProps> = ({
-  size,
-  onButtonClick,
-  children,
-}) => {
+const MyButton: Component<ButtonProps> = ({ size, onButtonClick }, children) => {
   const [isLoading, setIsLoading] = signal(false);
-  const fontSize = derive<string>("1em", () => `${size()}em`);
+  const fontSize = d`${size}em`;
 
   const onclick = async () => {
     return new Promise((resolve) => {
@@ -27,12 +22,14 @@ const MyButton: Component<ButtonProps> = ({
     });
   };
 
-  return Button({
-    style: { fontSize },
-    disabled: isLoading,
-    onclick,
-    children,
-  });
+  return Button(
+    {
+      style: { fontSize },
+      disabled: isLoading,
+      onclick,
+    },
+    children
+  );
 };
 
 const App = () => {
@@ -46,12 +43,10 @@ const App = () => {
     setSize(size() + 1);
   };
 
-  return Div({
-    children: [
-      H2({ children: () => `Size ${size()}` }),
-      MyButton({ onButtonClick, size, children: () => `button ${text()}` }),
-    ],
-  });
+  return Div([
+    H2(d`Size ${size}`),
+    MyButton({ onButtonClick, size }, d`button ${text}`),
+  ]);
 };
 
 // no need to use magic stuff to attach components to the dom,

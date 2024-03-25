@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { Div, P, h } from '../../src/dom';
-import { derive, signal } from '../../src/reactivity';
+import { d, derive, signal } from '../../src/reactivity';
 
 const body = document.body
 
@@ -17,7 +17,7 @@ describe("dom", () => {
   })
 
   it('create a div element with a text inside', () => {
-    const element = h("div", { children: ["ciao"] })
+    const element = h("div", ["ciao"])
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual("<div>ciao</div>")
@@ -53,7 +53,7 @@ describe("dom", () => {
 
   it('handle reactivity', () => {
     const [count, setCount] = signal(14)
-    const element = h("div", { style: { fontSize: () => `${count()}px` }, children: ["Increase"] })
+    const element = h("div", { style: { fontSize: () => `${count()}px` } }, ["Increase"])
     body.appendChild(element)
 
     expect(body.innerHTML).toEqual(`<div style="font-size: 14px;">Increase</div>`)
@@ -70,7 +70,7 @@ describe("dom", () => {
       const fontSize = () => `${count()}px`
       const increase = () => setCount(count() + 5)
 
-      return h("div", { className: 'test', style: { fontSize }, onclick: increase, children: ["Click me"] })
+      return h("div", { className: 'test', style: { fontSize }, onclick: increase }, ["Click me"])
     }
     body.appendChild(Element())
 
@@ -84,7 +84,7 @@ describe("dom", () => {
   it('remove a style property using an empty value', () => {
     const [visible, setVisible] = signal<string>('hidden')
 
-    body.appendChild(h("div", { style: { visibility: () => visible() }, children: ["Click me"] }))
+    body.appendChild(h("div", { style: { visibility: () => visible() } }, ["Click me"] ))
 
     expect(body.innerHTML).toEqual(`<div style="visibility: hidden;">Click me</div>`)
     setVisible('visible')
@@ -98,9 +98,9 @@ describe("dom", () => {
       const [count, setCount] = signal(10)
 
       const increase = () => setCount(count() + 5)
-      const size = () => `Size: ${count()}px`
+      const size = d`Size: ${count}px`
 
-      return h("div", { onclick: increase, children: [size] })
+      return h("div", { onclick: increase }, [size] )
     }
     body.appendChild(Element())
 
@@ -117,11 +117,11 @@ describe("dom", () => {
 
       const increase = () => setCount(count() + 5)
 
-      return h("div", { onclick: increase, children: [
-        h('strong', { children: [
-          () => `Size: ${count()}px`
-        ]})
-      ]})
+      return h("div", { onclick: increase }, [
+        h('strong', [
+          d`Size: ${count}px`
+        ])
+      ])
     }
     body.appendChild(Element())
 
@@ -139,10 +139,10 @@ describe("dom", () => {
     const text = () => count() >= 10 ? `Size: ${count()}px - ` : 'c'
     const howBig = () => (count() < 10) ? "CLICK ME" : (count() < 20) ? "S" : (count() < 40) ? "M" : (count() < 60) ? "L" : "XL"
 
-    body.appendChild(h("div", { children: [
+    body.appendChild(h("div", [
       text,
-      h('strong', { children: [howBig] })
-    ]}))
+      h('strong', [howBig])
+    ]))
 
     expect(body.innerHTML).toEqual(`<div>c<strong>CLICK ME</strong></div>`)
 
@@ -162,10 +162,9 @@ describe("dom", () => {
   it('update children based on status', () => {
     const [count, setCount] = signal(5)
     const increase = () => setCount(count() + 5)
-    const toElement = (count: number) => h('p', { children: count.toString() })
-    const children = derive<Element[]>([], (current) => [...current, toElement(count())])
+    const children = derive<Element[]>([], (current) => [...current, P(`${count()}`)])
 
-    body.appendChild(h("div", { children }))
+    body.appendChild(h("div", children))
 
     expect(body.innerHTML).toEqual(`<div><p>5</p></div>`)
 
@@ -178,10 +177,10 @@ describe("dom", () => {
 
   it('nested elements', () => {
     const Nested = ({ name }: {name: string}) => {
-      return h("p", { className: name, children: ["Nested"] })
+      return h("p", { className: name }, ["Nested"])
     }
     const Element = () => {
-      return h("div", { className: "Element", children: [Nested({name: 'name'})] })
+      return h("div", { className: "Element" }, [Nested({name: 'name'})])
     }
     body.appendChild(Element())
 
@@ -190,10 +189,10 @@ describe("dom", () => {
 
   it('use html components', () => {
     const Nested = ({ name }: {name: string}) => {
-      return P({ className: name, children: ["Nested"] })
+      return P({ className: name }, ["Nested"])
     }
     const Element = () => {
-      return Div({ className: "Element", children: [Nested({name: 'name'})]})
+      return Div({ className: "Element" }, [Nested({name: 'name'})])
     }
     body.appendChild(Element())
 

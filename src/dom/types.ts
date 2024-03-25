@@ -1,7 +1,9 @@
-export type Component<P = {}> = (props: P) => Element
+import { Accessor } from "../reactivity/types"
+
+export type Component<P> = ((props: P, children?: Children) => Element)
 export type Children = Reactive<Child[] | Child>
 export type Child = Element | Reactive<string>
-export type Reactive<T> = T | (() => T)
+export type Reactive<T> = T | Accessor<T>
 
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B
 type WritableKeysOf<T> = {[P in keyof T]: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>}[keyof T]
@@ -21,7 +23,7 @@ type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Ele
 
 export type DoomProperties<T extends keyof HTMLElementTagNameMap> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents & { children?: Children }
+} & ElementEvents
 
 export type DoomProperty<T extends keyof HTMLElementTagNameMap> = {
   key: keyof HTMLElementTagNameMap[T],

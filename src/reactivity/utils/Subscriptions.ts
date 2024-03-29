@@ -1,11 +1,10 @@
-import { Tree } from "./Tree";
-import { TreeSet } from "./TreeSet";
+import { MapSet } from "./MapSet";
 import { Subscriber, _Signal } from "../types";
 
 export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;
-  private derivations = new Tree<_Signal<any>, _Signal<any>>();
-  private subscriptions = new Tree<_Signal<any>, Subscriber>();
+  private ancestors = new MapSet<_Signal<any>, _Signal<any>>();
+  private subscriptions = new MapSet<_Signal<any>, Subscriber>();
 
   run(subscriber: Subscriber, fn: () => void): void {
     this.currentSubscriber = subscriber;
@@ -21,25 +20,27 @@ export class Subscriptions {
     if (!signal || !subscriber || signal === subscriber.derived) {
       return;
     }
-    this.subscriptions.addTo(signal, subscriber);
-    this.derivations.addTo(signal, subscriber.derived);
+
+    if (subscriber.derived) {
+      this.ancestors.addTo(subscriber.derived, signal);
+    }
+
+    this.subscriptions.addTo(this._getAncestor(signal), subscriber);
   }
 
   executeAllSubscriptionsTo(signal: _Signal<any>) {
-    this._subscriptionsTo(signal).forEach((subscriber) => subscriber.execute());
+    this.subscriptions
+      .get(signal)
+      .filter((subscription) => subscription !== this.currentSubscriber)
+      .forEach((subscriber) => subscriber.execute());
   }
 
-  private _subscriptionsTo(signal: _Signal<any>): TreeSet<Subscriber> {
-    const derivedSubscriptions = this.derivations
-      .get(signal)
-      .flatMap((derived) => this.derivations.get(derived).add(derived))
-      .flatMap(this._subscriptionsTo.bind(this));
+  private _getAncestor(signal: _Signal<any>): _Signal<any> {
+    const ancestor = this.ancestors.first(signal);
+    if (!ancestor) {
+      return signal;
+    }
 
-    return this.subscriptions.get(signal).filter((subscription) => {
-      return (
-        subscription !== this.currentSubscriber &&
-        !derivedSubscriptions.has(subscription)
-      );
-    });
+    return this._getAncestor(ancestor);
   }
 }

@@ -151,4 +151,41 @@ describe("reactivity", () => {
     expect(calls4).toEqual([1, 3, 5, 7, 9, 11]);
     expect(calls1).toEqual(["0 1", "1 3", "2 5", "3 7", "4 9", "5 11"]);
   });
+
+  it("execute only once the effect with two derived on same signal ", () => {
+    const calls: string[] = [];
+    const [count, setCount] = signal(1);
+    const multiply = derive(0, () => count() * 2);
+    const pixels = d`${count}px`;
+
+    effect(() => calls.push(`${multiply()} ${pixels()}`));
+
+    setCount(5);
+    setCount(7);
+
+    expect(calls).toEqual([
+      "2 1px",
+      "10 5px",
+      "14 7px",
+    ]);
+  });
+
+  it("execute only once the effect with two derived on same derivation ", () => {
+    const calls: string[] = [];
+    const [count, setCount] = signal(1);
+    const multiply = derive(0, () => count() * 2);
+    const mulPixels = d`${multiply}px`;
+    const mulPoints = d`${multiply}pt`;
+
+    effect(() => calls.push(`${mulPixels()} ${mulPoints()}`));
+
+    setCount(5);
+    setCount(7);
+
+    expect(calls).toEqual([
+      "2px 2pt",
+      "10px 10pt",
+      "14px 14pt",
+    ]);
+  });
 });

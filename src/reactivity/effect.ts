@@ -4,6 +4,7 @@ import { subscriptions } from "./subscriptions";
 export function effect(fn: () => void) {
   return _createEffect(fn);
 }
+
 export function _createEffect(
   fn: () => void,
   derived: _Signal<any> | null = null

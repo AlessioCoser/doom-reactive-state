@@ -4,3 +4,4 @@ build
 .DS_Store
 .parcel-cache
 coverage
+cdn

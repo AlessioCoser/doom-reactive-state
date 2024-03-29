@@ -10,7 +10,7 @@
     "test": "vitest",
     "coverage": "vitest --coverage",
     "dev": "vite",
-    "build": "rm -rf dist && tsup ./src",
+    "build": "rm -rf dist && rm -rf cdn && tsup",
     "release": "npm run build && ./publish.sh $1"
   },
   "author": "Alessio Coser",

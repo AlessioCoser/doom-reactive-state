@@ -32,3 +32,25 @@ jobs:
       - run: npm run release ${{ github.ref_name }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/create-release@v1
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          asset_path: ./cdn/doom-reactive-state.global.js
+          asset_name: doom-reactive-state.global.js
+          asset_content_type: application/javascript
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

@@ -1,4 +1,4 @@
-import { Button, Div, H2, H3, P, Strong, d, derive, effect, h, signal } from "doom-reactive-state"
+import { Button, Div, H2, P, d, derive, effect, h, signal } from "doom-reactive-state"
 import { Signal } from "doom-reactive-state/reactivity/types"
 
 type MainProps = { counter: Signal<number> }
@@ -39,10 +39,10 @@ const Main = ({ counter }: MainProps) => {
   // we can also use wrappers for the most common tags like H1, H2, ..., Div, P ...
   return h("div", [
     // only functions inside objects are binded
-    // all computed properties must be functions
+    // all computed properties must be functions (or derivations)
     H2(() => `count ${count()}`),
-    // we can also use the tagged template function 'd' to create a string deriveation in place.
-    // in the tagged template function the signal must not be evaluated, otherwise it will not react on changes
+    // d is a shorthand for a derived signal. Is a tagged template function 'd' that creates a string deriveation.
+    // in the tagged template function the signal you want to derive must not be evaluated, otherwise it will not react on changes
     Div(d`half is: ${half}`),
     // we can also use text accessor as reactive text children
     doubledText,

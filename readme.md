@@ -18,7 +18,7 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 3. Super-Easy reactive concepts (signal, effect, derive)
 4. No magic, you create components that are simple HTMLElements
 5. Just a few lines of code
-6. Only a single HTMLElement wrapper to enable reactivity on Element properties
+6. Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
 7. HtmlElement wrappers to easily use the standard html elements as reactive components
 
 ## Examples

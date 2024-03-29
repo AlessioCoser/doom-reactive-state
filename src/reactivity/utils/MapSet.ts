@@ -14,8 +14,4 @@ export class MapSet<K, V> {
   get(key: K | null): V[] {
     return (key && this.map.get(key)) || [];
   }
-
-  first(key: K | null): V | null {
-    return (key && this.map.get(key)?.[0]) ?? null;
-  }
 }

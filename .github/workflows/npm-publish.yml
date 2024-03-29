@@ -19,7 +19,7 @@ jobs:
       - run: npm ci
       - run: npm test run
 
-  publish:
+  npm-publish:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -32,7 +32,7 @@ jobs:
       - run: npm run release ${{ github.ref_name }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-  release:
+  github-release:
     needs: publish
     runs-on: ubuntu-latest
     steps:

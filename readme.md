@@ -28,20 +28,17 @@ You can find some examples here: [./examples](./examples)
 
 This is a simple increment counter component
 ```javascript
-const { signal, Div, H2, Span, Button } = require("doom-reactive-state")
+const { signal, Div, H2, Button, Span, d } = require("doom-reactive-state")
 
-function App() {
-  const [count, setCount] = signal(1)
+const App = () => {
+  const [count, setCount] = signal(0)
 
   const onclick = () => setCount(count() + 1)
 
-  return Div({ children: [
-    H2({ children: [
-      "Count: ",
-      Span({ children: [() => `${count()}`] })
-    ]}),
-    Button({ onclick, children: ['increment'] }),
-  ]})
+  return Div([
+    H2(['Count: ', Span(d`${count}`)]),
+    Button({ onclick }, 'increment'),
+  ])
 }
 
 document.body.appendChild(App())

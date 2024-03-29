@@ -33,7 +33,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   release:
-    needs: test
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -43,14 +43,23 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run build
-      - uses: actions/create-release@v1
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
         with:
           draft: false
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./cdn/doom-reactive-state.global.js
           asset_name: doom-reactive-state.global.js
           asset_content_type: application/javascript
-        env:
-          GITHUB_TOKEN: ${{ github.token }}

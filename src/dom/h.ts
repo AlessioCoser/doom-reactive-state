@@ -4,18 +4,15 @@ import {
   Children,
   DoomProperties,
   DoomProperty,
+  HTMLTag,
   Reactive,
   Style,
   Styles,
 } from "./types";
 import { updateChildren } from "./updateChildren";
 
-export function h<K extends keyof HTMLElementTagNameMap>(
-  component: K,
-  a?: DoomProperties<K> | Children,
-  b?: Children
-): Element {
-  const el: HTMLElementTagNameMap[K] = document.createElement(component as K);
+export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element {
+  const el: HTMLTag[K] = document.createElement(component as K);
   const { properties, children } = prepareArguments(a, b);
 
   toProperties(properties as DoomProperties<K>).forEach(({ key, value }) => {
@@ -51,10 +48,7 @@ function t(text: Reactive<string>): Text {
   return textNode;
 }
 
-function addChildren<K extends keyof HTMLElementTagNameMap>(
-  el: HTMLElementTagNameMap[K],
-  children: Children | undefined
-) {
+function addChildren<K extends keyof HTMLTag>(el: HTMLTag[K], children: Children | undefined) {
   if (typeof children === "function") {
     effect(() => updateChildren(el, evaluateChildNodes(children)));
   } else if (Array.isArray(children)) {
@@ -64,18 +58,14 @@ function addChildren<K extends keyof HTMLElementTagNameMap>(
   }
 }
 
-function appendTo<K extends keyof HTMLElementTagNameMap>(
-  element: HTMLElementTagNameMap[K]
-): (c: ChildNode) => ChildNode {
+function appendTo<K extends keyof HTMLTag>(element: HTMLTag[K]): (c: ChildNode) => ChildNode {
   return (child: ChildNode) => {
     element.appendChild(child);
     return child;
   };
 }
 
-function toProperties<K extends keyof HTMLElementTagNameMap>(
-  properties: DoomProperties<K>
-): DoomProperty<K>[] {
+function toProperties<K extends keyof HTMLTag>(properties: DoomProperties<K>): DoomProperty<K>[] {
   return Object.entries(properties).map((property) => {
     return { key: property[0], value: property[1] } as DoomProperty<K>;
   });
@@ -97,18 +87,12 @@ function evaluateChildNodes(children: Reactive<Child[] | Child>): ChildNode[] {
     : [toChildNode(reactive)];
 }
 
-function toChildNode(child: Child): ChildNode {
-  return typeof child === "object" ? child : t(child);
-}
+const toChildNode = (child: Child) => typeof child === "object" ? child : t(child);
 
 const pass = <T>(prop: Reactive<T>): T => prop as T;
-const evaluate = <T>(prop: Reactive<T>): T =>
-  typeof prop !== "function" ? prop : (prop as Function)();
+const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== "function" ? prop : (prop as Function)();
 
-function prepareArguments<K extends keyof HTMLElementTagNameMap>(
-  a: unknown,
-  b: unknown
-) {
+function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   if (!a && !b) {
     return { properties: {} as DoomProperties<K>, children: [] as Children };
   }

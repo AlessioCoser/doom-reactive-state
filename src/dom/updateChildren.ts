@@ -1,4 +1,7 @@
-// Slightly modified version of: https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/reconcile.js
+/*
+ * Slightly modified and tested version of:
+ * https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/reconcile.js
+*/
 export function updateChildren(parentNode: Node, b: ChildNode[]) {
   let a = childrenOf(parentNode);
   let bLength = b.length,

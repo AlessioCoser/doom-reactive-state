@@ -1,6 +1,8 @@
 import { Accessor } from "../reactivity/types"
 
+export type HTMLTag = HTMLElementTagNameMap
 export type Component<P> = ((props: P, children?: Children) => Element)
+export type HTMLComponent<P extends keyof HTMLTag> = Component<DoomProperties<P> | Children | undefined>
 export type Children = Reactive<Child[] | Child>
 export type Child = Element | Reactive<string>
 export type Reactive<T> = T | Accessor<T>
@@ -17,15 +19,15 @@ export type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDe
 export type Style = {key: keyof Styles, value: Styles[keyof Styles]}
 type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>
 
-type ElementWithoutEvents<T extends keyof HTMLElementTagNameMap> = Omit<HTMLElementTagNameMap[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
-type ElementProperties<T extends keyof HTMLElementTagNameMap> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
+type ElementWithoutEvents<T extends keyof HTMLTag> = Omit<HTMLTag[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
+type ElementProperties<T extends keyof HTMLTag> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
 type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
 
-export type DoomProperties<T extends keyof HTMLElementTagNameMap> = {
-  [K in keyof ElementProperties<T> as K extends keyof HTMLElementTagNameMap[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
+export type DoomProperties<T extends keyof HTMLTag> = {
+  [K in keyof ElementProperties<T> as K extends keyof HTMLTag[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
 } & ElementEvents
 
-export type DoomProperty<T extends keyof HTMLElementTagNameMap> = {
-  key: keyof HTMLElementTagNameMap[T],
-  value: Reactive<HTMLElementTagNameMap[T][keyof HTMLElementTagNameMap[T]]>
+export type DoomProperty<T extends keyof HTMLTag> = {
+  key: keyof HTMLTag[T],
+  value: Reactive<HTMLTag[T][keyof HTMLTag[T]]>
 }

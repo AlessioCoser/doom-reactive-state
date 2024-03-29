@@ -1,8 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script defer type="module" src="./index.ts"></script>
+    <script src="./cdn/index.global.js"></script>
   </head>
   <body>
+    <script type="application/javascript">
+      const Div = doom.Div
+      const Button = doom.Button
+      const signal = doom.signal
+      const derive = doom.derive
+      const d = doom.d
+
+      function App() {
+        var [counter, setCounter] = signal(1)
+        var onclick = () => setCounter(counter() + 1)
+
+        return Div([
+          Div(d`${counter}`),
+          Button({ className: "pippo", onclick }, () => "Increment")
+        ])
+      }
+      document.body.appendChild(App());
+    </script>
   </body>
 </html>

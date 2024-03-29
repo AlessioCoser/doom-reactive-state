@@ -12,8 +12,8 @@ export function d(
   strings: TemplateStringsArray,
   ...values: (Accessor<any> | any)[]
 ): Accessor<string> {
-  return derive('', () => {
-    const computed = values.map((v) => typeof v === "function" ? v() : v)
+  return derive("", () => {
+    const computed = values.map((v) => (typeof v === "function" ? v() : v));
     return String.raw({ raw: strings }, ...computed);
-  })
+  });
 }

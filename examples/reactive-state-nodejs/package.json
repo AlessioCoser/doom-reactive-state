@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "doom-reactive-state": "^1.0.2"
+    "doom-reactive-state": "^1.0.3"
   }
 }

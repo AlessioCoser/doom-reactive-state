@@ -22,7 +22,7 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 7. HtmlElement wrappers to easily use the standard html elements as reactive components
 
 ## Examples
-You can find some examples here: [./examples](./examples)
+You can find some examples here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
 
 ## Getting Started
 

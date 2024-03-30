@@ -15,6 +15,10 @@
   },
   "author": "Alessio Coser",
   "license": "MIT",
+  "homepage": "https://github.com/AlessioCoser/doom-reactive-state",
+  "repository": {
+    "url": "https://github.com/AlessioCoser/doom-reactive-state"
+  },
   "devDependencies": {
     "@types/jsdom": "^21.1.0",
     "@vitest/coverage-v8": "^1.4.0",

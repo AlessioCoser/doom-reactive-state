@@ -63,6 +63,26 @@ document.body.appendChild(App())
 3. You will see that every second the incremented number will be printed
 
 
+## Use it directly inside the HTML
+You can load the script from the github release url and start use it right away.
+```html
+<html>
+  <head>
+    <!-- other stuff -->
+    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.0/doom-reactive-state.global.js"></script>
+  </head>
+  <body>
+    <script type="application/javascript">
+      function HelloWorldApp() {
+        return doom.Span("Hello World!")
+      }
+
+      document.body.appendChild(HelloWorldApp());
+    </script>
+  </body>
+</html>
+```
+
 # Contributing
 
 ## Run Tests

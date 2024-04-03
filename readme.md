@@ -63,7 +63,7 @@ document.body.appendChild(App())
 3. You will see that every second the incremented number will be printed
 
 
-## Use it directly inside the HTML
+### Use it directly inside the HTML
 You can load the script from the github release url and start use it right away.
 ```html
 <html>

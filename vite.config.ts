@@ -6,7 +6,7 @@ export default defineConfig({
     environment: "jsdom",
     coverage: {
       reporter: ["text", "html"],
-      exclude: [ "index.ts", "examples/**" ],
+      exclude: [ "index.ts", "examples/**", "cdn/**" ],
     },
   }
 });

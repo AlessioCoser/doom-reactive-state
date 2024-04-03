@@ -188,4 +188,50 @@ describe("reactivity", () => {
       "14px 14pt",
     ]);
   });
+
+  it("derive from multiple signals", () => {
+    const calls: string[] = [];
+    const [count, setCount] = signal(1);
+    const [name, setName] = signal("First");
+    const nameAndCount = d`${name} -> ${count}`
+
+    effect(() => calls.push(nameAndCount()));
+
+    setCount(5);
+    setName("Second");
+    setName("Third");
+    setCount(7);
+
+    expect(calls).toEqual([
+      "First -> 1",
+      "First -> 5",
+      "Second -> 5",
+      "Third -> 5",
+      "Third -> 7",
+    ]);
+  });
+
+  it("derive from multiple signals and other derivations", () => {
+    const calls: string[] = [];
+    const [count, setCount] = signal(1);
+    const [name, setName] = signal("First");
+    const nameAndCount = d`${name} -> ${count}`
+    const sum = derive(0, () => count() + count())
+    const sumText = d`${nameAndCount} + ${count} = ${sum}`
+
+    effect(() => calls.push(sumText()));
+
+    setCount(5);
+    setName("Second");
+    setName("Third");
+    setCount(7);
+
+    expect(calls).toEqual([
+      "First -> 1 + 1 = 2",
+      "First -> 5 + 5 = 10",
+      "Second -> 5 + 5 = 10",
+      "Third -> 5 + 5 = 10",
+      "Third -> 7 + 7 = 14",
+    ]);
+  });
 });

@@ -3,7 +3,7 @@ import { Subscriber, _Signal } from "../types";
 
 export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;
-  private ancestors = new Map<_Signal<any>, _Signal<any>>();
+  private ancestors = new MapSet<_Signal<any>, _Signal<any>>();
   private subscriptions = new MapSet<_Signal<any>, Subscriber>();
 
   run(subscriber: Subscriber, fn: () => void): void {
@@ -22,10 +22,12 @@ export class Subscriptions {
     }
 
     if (subscriber.derived) {
-      this.ancestors.set(subscriber.derived, signal);
+      this.ancestors.addTo(subscriber.derived, signal);
     }
 
-    this.subscriptions.addTo(this._getAncestor(signal), subscriber);
+    this._getAncestors(signal).forEach((ancestor) => {
+      this.subscriptions.addTo(ancestor, subscriber);
+    });
   }
 
   executeAllSubscriptionsTo(signal: _Signal<any>) {
@@ -35,12 +37,12 @@ export class Subscriptions {
       .forEach((subscriber) => subscriber.execute());
   }
 
-  private _getAncestor(signal: _Signal<any>): _Signal<any> {
-    const ancestor = this.ancestors.get(signal);
-    if (!ancestor) {
-      return signal;
+  private _getAncestors(signal: _Signal<any>): _Signal<any>[] {
+    const ancestors = this.ancestors.get(signal);
+    if (!ancestors || ancestors.length === 0) {
+      return [signal];
     }
 
-    return this._getAncestor(ancestor);
+    return ancestors.flatMap((ancestor) => this._getAncestors(ancestor));
   }
 }

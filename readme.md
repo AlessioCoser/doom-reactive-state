@@ -13,13 +13,13 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?colorB=007EC6)](https://spdx.org/licenses/MIT)
 
 ## Features
-1. Zero dependencies
-2. No compilation required
-3. Super-Easy reactive concepts (signal, effect, derive)
-4. No magic, you create components that are simple HTMLElements
-5. Just a few lines of code
-6. Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
-7. HtmlElement wrappers to easily use the standard html elements as reactive components
+1. :gem: Zero dependencies
+2. :zap: No compilation required
+3. :surfer: Super-Easy reactive concepts (signal, effect, derive)
+4. :four_leaf_clover: No magic, you create components that are simple HTMLElements
+5. :blossom: Just a few lines of code
+6. :hatching_chick: Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
+7. :lipstick: Some helper functions to easily create common reactive HTMLElement such as `Div`, `P` and `Span`.
 
 ## Examples
 You can find some examples here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
@@ -69,7 +69,7 @@ You can load the script from the github release url and start use it right away.
 <html>
   <head>
     <!-- other stuff -->
-    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.0/doom-reactive-state.global.js"></script>
+    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.1/doom-reactive-state.global.js"></script>
   </head>
   <body>
     <script type="application/javascript">

@@ -1,10 +1,10 @@
-import { MapSet } from "./MapSet";
+import { MapArray } from "./MapArray";
 import { Subscriber, _Signal } from "../types";
 
 export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;
-  private ancestors = new MapSet<_Signal<any>, _Signal<any>>();
-  private subscriptions = new MapSet<_Signal<any>, Subscriber>();
+  private ancestors = new MapArray<_Signal<any>, _Signal<any>>();
+  private subscriptions = new MapArray<_Signal<any>, Subscriber>();
 
   run(subscriber: Subscriber, fn: () => void): void {
     this.currentSubscriber = subscriber;

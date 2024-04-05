@@ -1,4 +1,4 @@
-export class MapSet<K, V> {
+export class MapArray<K, V> {
   private map = new Map<K, V[]>();
 
   addTo(key: K, newValue: V) {

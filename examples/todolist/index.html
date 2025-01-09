@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script defer type="module" src="./index.ts"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-size: 1.4rem;
+      }
+      body {
+        background-color: #f0f0f0;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: top;
+      }
+      body > div {
+        padding: 1rem;
+      }
+      input {
+        display: flex;
+        width: 100%;
+        padding: .5rem 1rem;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.5rem;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+      }
+      input:focus {
+        color: #212529;
+        background-color: #fff;
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+      }
+      ul {
+        list-style-type: none;
+        padding: 0.5rem 0;
+        margin: 1rem 0;
+        width: 100%;
+        border-top: 1px dashed gray;
+      }
+      li {
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.3rem 1rem;
+        font-size: 0.5rem;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.5rem;
+        margin: 0.5rem 0;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+      }
+      li:hover {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+      }
+      li div {
+        align-content: center;
+        font-size: 1rem;
+      }
+      li div.delete:hover {
+        color: #b72121;
+        font-weight: bold;
+      }
+      li.done {
+        color: #6c757d;
+      }
+      li.done div {
+        text-decoration: line-through;
+      }
+      li.done div.delete {
+        text-decoration: none;
+      }
+      li.done:hover {
+        border-color: #a8a8a8;
+        box-shadow: 0 0 0 .25rem rgba(111, 111, 111, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+  </body>
+</html>

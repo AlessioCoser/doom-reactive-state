@@ -7,11 +7,12 @@
   "version": "%VERSION%",
   "description": "",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
     "coverage": "vitest --coverage",
     "dev": "vite",
     "build": "rm -rf dist && rm -rf cdn && tsup",
-    "release": "npm run build && ./publish.sh $1"
+    "release": "npm run build && ./publish.sh $1",
+    "example:todolist": "cd examples/todolist && npm start"
   },
   "author": "Alessio Coser",
   "license": "MIT",

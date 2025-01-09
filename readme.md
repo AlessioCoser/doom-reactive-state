@@ -24,6 +24,12 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 ## Examples
 You can find some examples here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
 
+## Install
+Use your preferred package manager:
+- `npm install doom-reactive-state`
+- `yarn add doom-reactive-state`
+- `pnpm add doom-reactive-state`
+
 ## Getting Started
 
 This is a simple increment counter component
@@ -69,7 +75,7 @@ You can load the script from the github release url and start use it right away.
 <html>
   <head>
     <!-- other stuff -->
-    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.1/doom-reactive-state.global.js"></script>
+    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.2/doom-reactive-state.global.js"></script>
   </head>
   <body>
     <script type="application/javascript">

@@ -9,7 +9,7 @@ import {
   Style,
   Styles,
 } from "./types";
-import { updateChildren } from "./updateChildren";
+import { updateChildrenFast } from "./updateChildren";
 
 export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element {
   const el: HTMLTag[K] = document.createElement(component as K);
@@ -50,7 +50,12 @@ function t(text: Reactive<string>): Text {
 
 function addChildren<K extends keyof HTMLTag>(el: HTMLTag[K], children: Children | undefined) {
   if (typeof children === "function") {
-    effect(() => updateChildren(el, evaluateChildNodes(children)));
+    // Keep previous child nodes to avoid reading DOM each update
+    let prev: ChildNode[] = [];
+    effect(() => {
+      const next = evaluateChildNodes(children);
+      prev = updateChildrenFast(el, prev, next);
+    });
   } else if (Array.isArray(children)) {
     children.map(toChildNode).map(appendTo(el));
   } else if (children) {

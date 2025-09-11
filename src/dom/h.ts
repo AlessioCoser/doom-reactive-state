@@ -1,95 +1,107 @@
-import { effect } from "../reactivity";
+import {effect} from "../reactivity";
 import {
-  Child,
-  Children,
-  DoomProperties,
-  DoomProperty,
-  HTMLTag,
-  Reactive,
-  Style,
-  Styles,
+    Child,
+    Children,
+    DoomProperties,
+    DoomProperty,
+    HTMLTag,
+    Reactive,
+    Style,
+    Styles,
+    KeyedElement,
+    KeyValue,
 } from "./types";
-import { updateChildrenFast } from "./updateChildren";
+import {updateChildrenFast} from "./updateChildren";
 
+export function h<K extends keyof HTMLTag>(component: K, a: (DoomProperties<K> & { key: KeyValue }) | Children, b?: Children): KeyedElement;
+export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element;
 export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element {
-  const el: HTMLTag[K] = document.createElement(component as K);
-  const { properties, children } = prepareArguments(a, b);
+    const el: HTMLTag[K] = document.createElement(component as K);
+    const {properties, children} = prepareArguments(a, b);
 
-  toProperties(properties as DoomProperties<K>).forEach(({ key, value }) => {
-    if (key === "style") {
-      effect(() => {
-        const styles = evaluate(value as Reactive<Styles>);
-        toStyles(styles).forEach((style) => {
-          el.style[style.key] = evaluate(style.value) || "";
+    const maybeKey = (properties as Partial<DoomProperties<K>>)?.key as KeyValue | undefined;
+    if (maybeKey != null) {
+        (el as any).key = maybeKey;
+    }
+
+    toProperties(properties as DoomProperties<K>)
+        .filter(({key}) => key !== ("key" as any))
+        .forEach(({key, value}) => {
+            if (key === "style") {
+                effect(() => {
+                    const styles = evaluate(value as Reactive<Styles>);
+                    toStyles(styles).forEach((style) => {
+                        el.style[style.key] = evaluate(style.value) || "";
+                    });
+                });
+                return;
+            }
+
+
+            if ((key as String).startsWith("on")) {
+                el[key as keyof HTMLTag[K]] = pass(value);
+                return;
+            }
+
+            effect(() => ((el as any)[key] = evaluate(value)));
         });
-      });
-      return;
-    }
 
-    if ((key as String).startsWith("on")) {
-      el[key] = pass(value);
-      return;
-    }
+    addChildren(el, children as Children);
 
-    effect(() => (el[key] = evaluate(value)));
-  });
-
-  addChildren(el, children as Children);
-
-  return el;
+    return el;
 }
 
 function t(text: Reactive<string>): Text {
-  if (typeof text === "string") {
-    return document.createTextNode(text);
-  }
-  const textNode = document.createTextNode("");
-  effect(() => (textNode.textContent = evaluate(text)));
-  return textNode;
+    if (typeof text === "string") {
+        return document.createTextNode(text);
+    }
+    const textNode = document.createTextNode("");
+    effect(() => (textNode.textContent = evaluate(text)));
+    return textNode;
 }
 
 function addChildren<K extends keyof HTMLTag>(el: HTMLTag[K], children: Children | undefined) {
-  if (typeof children === "function") {
-    // Keep previous child nodes to avoid reading DOM each update
-    let prev: ChildNode[] = [];
-    effect(() => {
-      const next = evaluateChildNodes(children);
-      prev = updateChildrenFast(el, prev, next);
-    });
-  } else if (Array.isArray(children)) {
-    children.map(toChildNode).map(appendTo(el));
-  } else if (children) {
-    [children].map(toChildNode).map(appendTo(el));
-  }
+    if (typeof children === "function") {
+        // Keep previous child nodes to avoid reading DOM each update
+        let prev: ChildNode[] = [];
+        effect(() => {
+            const next = evaluateChildNodes(children);
+            prev = updateChildrenFast(el, prev, next);
+        });
+    } else if (Array.isArray(children)) {
+        children.map(toChildNode).map(appendTo(el));
+    } else if (children) {
+        [children].map(toChildNode).map(appendTo(el));
+    }
 }
 
 function appendTo<K extends keyof HTMLTag>(element: HTMLTag[K]): (c: ChildNode) => ChildNode {
-  return (child: ChildNode) => {
-    element.appendChild(child);
-    return child;
-  };
+    return (child: ChildNode) => {
+        element.appendChild(child);
+        return child;
+    };
 }
 
 function toProperties<K extends keyof HTMLTag>(properties: DoomProperties<K>): DoomProperty<K>[] {
-  return Object.entries(properties).map((property) => {
-    return { key: property[0], value: property[1] } as DoomProperty<K>;
-  });
+    return Object.entries(properties).map((property) => {
+        return {key: property[0], value: property[1]} as DoomProperty<K>;
+    });
 }
 
 function toStyles(styleValue: Styles): Style[] {
-  return Object.entries(styleValue).map((styleAttribute) => {
-    return {
-      key: styleAttribute[0] as Style["key"],
-      value: styleAttribute[1] as Style["value"],
-    };
-  });
+    return Object.entries(styleValue).map((styleAttribute) => {
+        return {
+            key: styleAttribute[0] as Style["key"],
+            value: styleAttribute[1] as Style["value"],
+        };
+    });
 }
 
 function evaluateChildNodes(children: Reactive<Child[] | Child>): ChildNode[] {
-  const reactive = evaluate(children);
-  return Array.isArray(reactive)
-    ? reactive.map(toChildNode)
-    : [toChildNode(reactive)];
+    const reactive = evaluate(children);
+    return Array.isArray(reactive)
+        ? reactive.map(toChildNode)
+        : [toChildNode(reactive)];
 }
 
 const toChildNode = (child: Child) => typeof child === "object" ? child : t(child);
@@ -98,17 +110,17 @@ const pass = <T>(prop: Reactive<T>): T => prop as T;
 const evaluate = <T>(prop: Reactive<T>): T => typeof prop !== "function" ? prop : (prop as Function)();
 
 function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
-  if (!a && !b) {
-    return { properties: {} as DoomProperties<K>, children: [] as Children };
-  }
-
-  if (!b) {
-    if (Array.isArray(a) || typeof a === "function" || typeof a === "string") {
-      return { properties: {} as DoomProperties<K>, children: a as Children };
-    } else {
-      return { properties: a as DoomProperties<K>, children: [] as Children };
+    if (!a && !b) {
+        return {properties: {} as DoomProperties<K>, children: [] as Children};
     }
-  }
 
-  return { properties: a as DoomProperties<K>, children: b as Children };
+    if (!b) {
+        if (Array.isArray(a) || typeof a === "function" || typeof a === "string") {
+            return {properties: {} as DoomProperties<K>, children: a as Children};
+        } else {
+            return {properties: a as DoomProperties<K>, children: [] as Children};
+        }
+    }
+
+    return {properties: a as DoomProperties<K>, children: b as Children};
 }

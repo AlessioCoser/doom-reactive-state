@@ -2,10 +2,16 @@ import { Accessor } from "../reactivity/types"
 
 export type HTMLTag = HTMLElementTagNameMap
 export type Component<P> = ((props: P, children?: Children) => Element)
-export type HTMLComponent<P extends keyof HTMLTag> = Component<DoomProperties<P> | Children | undefined>
+export type HTMLComponent<P extends keyof HTMLTag> = {
+  (props: (DoomProperties<P> & { key: KeyValue }) | Children, children?: Children): KeyedElement
+  (props?: DoomProperties<P> | Children, children?: Children): Element
+}
 export type Children = Reactive<Child[] | Child>
 export type Child = Element | Reactive<string>
 export type Reactive<T> = T | Accessor<T>
+
+export type KeyValue = string | number
+export type KeyedElement = Element & { key: KeyValue }
 
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B
 type WritableKeysOf<T> = {[P in keyof T]: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P, never>}[keyof T]
@@ -27,7 +33,7 @@ type ElementEvents<T extends keyof HTMLTag> = { [K in keyof ElementEventHandlers
 
 export type DoomProperties<T extends keyof HTMLTag> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLTag[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents<T>
+} & ElementEvents<T> & { key?: KeyValue }
 
 export type DoomProperty<T extends keyof HTMLTag> = {
   key: keyof HTMLTag[T],

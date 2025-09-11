@@ -21,11 +21,13 @@ type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>
 
 type ElementWithoutEvents<T extends keyof HTMLTag> = Omit<HTMLTag[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
 type ElementProperties<T extends keyof HTMLTag> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
-type ElementEvents = Partial<Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>>
+type ElementEventHandlers = Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>
+type RemapThis<F, This> = F extends ((this: any, ...args: infer A) => infer R) | null ? ((this: This, ...args: A) => R) : F
+type ElementEvents<T extends keyof HTMLTag> = { [K in keyof ElementEventHandlers]?: RemapThis<ElementEventHandlers[K], HTMLTag[T]> }
 
 export type DoomProperties<T extends keyof HTMLTag> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLTag[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents
+} & ElementEvents<T>
 
 export type DoomProperty<T extends keyof HTMLTag> = {
   key: keyof HTMLTag[T],

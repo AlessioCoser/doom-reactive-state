@@ -11,7 +11,6 @@ import {
     KeyedElement,
     KeyValue,
 } from "./types";
-import {updateChildrenFast} from "./updateChildren";
 
 export function h<K extends keyof HTMLTag>(component: K, a: (DoomProperties<K> & { key: KeyValue }) | Children, b?: Children): KeyedElement;
 export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> | Children, b?: Children): Element;
@@ -37,7 +36,6 @@ export function h<K extends keyof HTMLTag>(component: K, a?: DoomProperties<K> |
                 return;
             }
 
-
             if ((key as String).startsWith("on")) {
                 el[key as keyof HTMLTag[K]] = pass(value);
                 return;
@@ -61,17 +59,10 @@ function t(text: Reactive<string>): Text {
 }
 
 function addChildren<K extends keyof HTMLTag>(el: HTMLTag[K], children: Children | undefined) {
-    if (typeof children === "function") {
-        // Keep previous child nodes to avoid reading DOM each update
-        let prev: ChildNode[] = [];
-        effect(() => {
-            const next = evaluateChildNodes(children);
-            prev = updateChildrenFast(el, prev, next);
-        });
-    } else if (Array.isArray(children)) {
+    if (Array.isArray(children)) {
         children.map(toChildNode).map(appendTo(el));
     } else if (children) {
-        [children].map(toChildNode).map(appendTo(el));
+        appendTo(el)(toChildNode(children));
     }
 }
 
@@ -97,13 +88,6 @@ function toStyles(styleValue: Styles): Style[] {
     });
 }
 
-function evaluateChildNodes(children: Reactive<Child[] | Child>): ChildNode[] {
-    const reactive = evaluate(children);
-    return Array.isArray(reactive)
-        ? reactive.map(toChildNode)
-        : [toChildNode(reactive)];
-}
-
 const toChildNode = (child: Child) => typeof child === "object" ? child : t(child);
 
 const pass = <T>(prop: Reactive<T>): T => prop as T;
@@ -115,7 +99,7 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
     }
 
     if (!b) {
-        if (Array.isArray(a) || typeof a === "function" || typeof a === "string") {
+        if (Array.isArray(a) || typeof a === "string" || typeof a === "function") {
             return {properties: {} as DoomProperties<K>, children: a as Children};
         } else {
             return {properties: a as DoomProperties<K>, children: [] as Children};

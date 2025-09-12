@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeEach } from "vitest";
-import { Div, P, h, d, derive, signal } from "../../src";
+import { Div, P, h, d, signal } from "../../src";
 
 const body = document.body;
 
@@ -20,17 +20,6 @@ describe("dom", () => {
     body.appendChild(element);
 
     expect(body.innerHTML).toEqual("<div>ciao</div>");
-  });
-
-  it("create a div with a single reactive child", () => {
-    const [greet, setGreet] = signal("ciao");
-
-    const element = h("div", d`${greet}`);
-    body.appendChild(element);
-
-    expect(body.innerHTML).toEqual("<div>ciao</div>");
-    setGreet("Hola!");
-    expect(body.innerHTML).toEqual("<div>Hola!</div>");
   });
 
   it("create a div element with properties", () => {
@@ -204,25 +193,6 @@ describe("dom", () => {
     );
   });
 
-  it("update children based on status", () => {
-    const [count, setCount] = signal(5);
-    const increase = () => setCount(count() + 5);
-    const children = derive<Element[]>([], (current) => [
-      ...current,
-      P(`${count()}`),
-    ]);
-
-    body.appendChild(h("div", children));
-
-    expect(body.innerHTML).toEqual(`<div><p>5</p></div>`);
-
-    increase();
-    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p></div>`);
-
-    increase();
-    expect(body.innerHTML).toEqual(`<div><p>5</p><p>10</p><p>15</p></div>`);
-  });
-
   it("nested elements", () => {
     const Nested = ({ name }: { name: string }) => {
       return h("p", { className: name }, ["Nested"]);
@@ -249,5 +219,139 @@ describe("dom", () => {
     expect(body.innerHTML).toEqual(
       `<div class="Element"><p class="name">Nested</p></div>`
     );
+  });
+
+  it("create element with properties and children", () => {
+    const element = h("div", { className: "container" }, ["Hello", " ", "World"]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual(`<div class="container">Hello World</div>`);
+  });
+
+  it("create element with reactive children in array", () => {
+    const [text, setText] = signal("initial");
+    const element = h("div", ["Static: ", () => text()]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div>Static: initial</div>");
+
+    setText("updated");
+    expect(body.innerHTML).toEqual("<div>Static: updated</div>");
+  });
+
+  it("handle mixed static and reactive children", () => {
+    const [count, setCount] = signal(5);
+    const element = h("div", [
+      "Count: ",
+      () => count().toString(),
+      " items"
+    ]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div>Count: 5 items</div>");
+
+    setCount(10);
+    expect(body.innerHTML).toEqual("<div>Count: 10 items</div>");
+  });
+
+  it("handle reactive className changes", () => {
+    const [isDone, setIsDone] = signal(false);
+    const element = h("div", { className: () => isDone() ? "done" : "" }, ["Task"]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual(`<div class="">Task</div>`);
+
+    setIsDone(true);
+    expect(body.innerHTML).toEqual(`<div class="done">Task</div>`);
+
+    setIsDone(false);
+    expect(body.innerHTML).toEqual(`<div class="">Task</div>`);
+  });
+
+  it("handle multiple reactive style properties", () => {
+    const [size, setSize] = signal(16);
+    const [color, setColor] = signal("red");
+
+    const element = h("div", {
+      style: {
+        fontSize: () => `${size()}px`,
+        color: () => color()
+      }
+    }, ["Styled text"]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual(`<div style="font-size: 16px; color: red;">Styled text</div>`);
+
+    setSize(20);
+    expect(body.innerHTML).toEqual(`<div style="font-size: 20px; color: red;">Styled text</div>`);
+
+    setColor("blue");
+    expect(body.innerHTML).toEqual(`<div style="font-size: 20px; color: blue;">Styled text</div>`);
+  });
+
+  it("handle event handlers with reactive context", () => {
+    const [clicked, setClicked] = signal(false);
+
+    const element = h("button", {
+      onclick: () => setClicked(true),
+      className: () => clicked() ? "clicked" : ""
+    }, [() => clicked() ? "Clicked!" : "Click me"]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual(`<button class="">Click me</button>`);
+
+    body.querySelector("button")?.click();
+    expect(body.innerHTML).toEqual(`<button class="clicked">Clicked!</button>`);
+  });
+
+  it("handle nested reactive elements", () => {
+    const [outer, setOuter] = signal("outer");
+    const [inner, setInner] = signal("inner");
+
+    const element = h("div", [
+      () => outer(),
+      h("span", [() => inner()])
+    ]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div>outer<span>inner</span></div>");
+
+    setOuter("OUTER");
+    expect(body.innerHTML).toEqual("<div>OUTER<span>inner</span></div>");
+
+    setInner("INNER");
+    expect(body.innerHTML).toEqual("<div>OUTER<span>INNER</span></div>");
+  });
+
+  it("handle empty children arrays", () => {
+    const element = h("div", []);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div></div>");
+  });
+
+  it("handle undefined children", () => {
+    const element = h("div", undefined);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div></div>");
+  });
+
+  it("handle complex reactive conditions", () => {
+    const [count, setCount] = signal(0);
+
+    const element = h("div", [
+      () => count() === 0 ? "Empty" : `Count: ${count()}`,
+      h("span", [() => count() > 5 ? " (High)" : " (Low)"])
+    ]);
+    body.appendChild(element);
+
+    expect(body.innerHTML).toEqual("<div>Empty<span> (Low)</span></div>");
+
+    setCount(3);
+    expect(body.innerHTML).toEqual("<div>Count: 3<span> (Low)</span></div>");
+
+    setCount(7);
+    expect(body.innerHTML).toEqual("<div>Count: 7<span> (High)</span></div>");
   });
 });

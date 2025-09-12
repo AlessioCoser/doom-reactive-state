@@ -1,7 +1,7 @@
 import { effect, signal } from "../reactivity";
 import { Accessor } from "../reactivity/types";
 import { KeyedElement, KeyValue } from "./types";
-import { updateChildrenFast } from "./updateChildren";
+import { updateChildren } from "./updateChildren";
 
 type ForProps<T> = {
   children: Accessor<T[]>
@@ -20,7 +20,7 @@ export function For<T>(props: ForProps<T>): Element {
         
         if (items.length === 0) {
             itemSignals.clear();
-            prev = updateChildrenFast(container, prev, []);
+            prev = updateChildren(container, prev, []);
             return;
         }
         
@@ -61,7 +61,7 @@ export function For<T>(props: ForProps<T>): Element {
             }
         }
         
-        prev = updateChildrenFast(container, prev, next);
+        prev = updateChildren(container, prev, next);
     });
     
     return container;

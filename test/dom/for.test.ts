@@ -355,4 +355,66 @@ describe("For component", () => {
         expect(afterElements[0]).toBe(initialElements[0]);
         expect(afterElements[1]).toBe(initialElements[2]);
     });
+
+    it("can be used as children in h() function", () => {
+        const [items] = signal([
+            {id: 1, name: "Item 1"},
+            {id: 2, name: "Item 2"},
+            {id: 3, name: "Item 3"}
+        ]);
+
+        // Test using For component as the second argument (children) of h()
+        const container = Div({key: "container"}, For({
+            children: items,
+            each: (item) => Li({key: item().id}, [item().name])
+        }));
+
+        body.appendChild(container);
+
+        // Verify the structure: div contains the For component's display:contents div with list items
+        expect(body.innerHTML).toContain("Item 1");
+        expect(body.innerHTML).toContain("Item 2");
+        expect(body.innerHTML).toContain("Item 3");
+
+        // Verify that the For component is properly nested inside the div
+        const outerDiv = body.querySelector('div');
+        expect(outerDiv).toBeTruthy();
+        expect((outerDiv as any).key).toBe("container");
+
+        const forContainer = outerDiv?.querySelector('div[style*="display: contents"]');
+        expect(forContainer).toBeTruthy();
+
+        const listItems = forContainer?.querySelectorAll('li');
+        expect(listItems?.length).toBe(3);
+    });
+
+    it("can be used as children in h() function with reactive updates", () => {
+        const [items, setItems] = signal([
+            {id: 1, name: "Initial Item"}
+        ]);
+
+        // Test using For component as children with reactive updates
+        const wrapper = Div({key: "wrapper"}, For({
+            children: items,
+            each: (item) => Li({key: item().id}, [() => item().name])
+        }));
+
+        body.appendChild(wrapper);
+
+        // Initial state
+        expect(body.innerHTML).toContain("Initial Item");
+
+        // Update items
+        setItems([
+            {id: 1, name: "Updated Item"},
+            {id: 2, name: "New Item"}
+        ]);
+
+        // Verify updates work correctly when For is used as children
+        expect(body.innerHTML).toContain("Updated Item");
+        expect(body.innerHTML).toContain("New Item");
+
+        const listItems = body.querySelectorAll('li');
+        expect(listItems.length).toBe(2);
+    });
 });

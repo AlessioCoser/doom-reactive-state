@@ -7,7 +7,7 @@
   "version": "%VERSION%",
   "description": "",
   "scripts": {
-    "test": "vitest run",
+    "test": "tsc --noEmit && vitest run",
     "coverage": "vitest --coverage",
     "dev": "vite",
     "build": "rm -rf dist && rm -rf cdn && tsup",

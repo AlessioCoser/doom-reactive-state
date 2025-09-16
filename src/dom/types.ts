@@ -1,11 +1,11 @@
-import type { Accessor } from "../reactivity/types"
+import type { Accessor } from "../reactivity"
 
 export type HTMLTag = HTMLElementTagNameMap
 export type Component<P> = (props: P, children?: Children) => Element
-export type HTMLComponent<P extends keyof HTMLTag> = {
-  (props: (DoomProperties<P> & { key: KeyValue }) | Children, children?: Children): KeyedElement
-  (props?: DoomProperties<P> | Children, children?: Children): Element
-}
+export type HTMLComponent<P extends keyof HTMLTag> = <T extends DoomProperties<P> | KeyedDoomProperties<P> | Children>(
+    props?: T,
+    children?: Children
+) => T extends KeyedDoomProperties<P> ? KeyedElement : Element;
 export type Children = Child[] | Child
 export type Child = Element | Reactive<string>
 export type Reactive<T> = T | Accessor<T>
@@ -31,9 +31,22 @@ type ElementEventHandlers = Omit<GlobalEventHandlers, FunctionPropertyNames<Elem
 type RemapThis<F, This> = F extends ((this: any, ...args: infer A) => infer R) | null ? ((this: This, ...args: A) => R) : F
 type ElementEvents<T extends keyof HTMLTag> = { [K in keyof ElementEventHandlers]?: RemapThis<ElementEventHandlers[K], HTMLTag[T]> }
 
+type OmitEvents<T> = {
+  [K in keyof T as K extends `on${string}` ? never : K]: T[K]
+}
+
+type KeepOnlyEvents<T> = {
+  [K in keyof T as K extends `on${string}` ? K : never]: T[K]
+}
+
+export type DoomEvents<T extends keyof HTMLTag> = KeepOnlyEvents<DoomPropertiesNoStyle<T>>
+export type DoomPropertiesNoStyleNoEvents<T extends keyof HTMLTag> = OmitEvents<DoomPropertiesNoStyle<T>>
+export type DoomPropertiesNoStyle<T extends keyof HTMLTag> = Omit<DoomProperties<T>, 'style'>
 export type DoomProperties<T extends keyof HTMLTag> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLTag[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents<T> & { key?: KeyValue }
+} & ElementEvents<T>
+
+export type KeyedDoomProperties<T extends keyof HTMLTag> = DoomProperties<T> & { key: KeyValue }
 
 export type DoomProperty<T extends keyof HTMLTag> = {
   key: keyof HTMLTag[T],

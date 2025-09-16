@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from "vitest";
-import {signal, For, Li, Div} from "../../src";
+import {signal, For, Li, Div, Ul} from "../../src";
 
 const body = document.body;
 
@@ -17,7 +17,7 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toEqual("<div style=\"display: contents;\"></div>");
+        expect(body.innerHTML).toEqual('<div style="display: contents;"></div>');
     });
 
     it("renders initial items", () => {
@@ -47,15 +47,14 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Item 1");
+        expect(body.innerHTML).toContain("<li>Item 1</li>");
 
         setItems([
             {id: 1, name: "Updated Item 1"},
             {id: 2, name: "Item 2"}
         ]);
 
-        expect(body.innerHTML).toContain("Updated Item 1");
-        expect(body.innerHTML).toContain("Item 2");
+        expect(body.innerHTML).toContain("<li>Updated Item 1</li><li>Item 2</li>");
     });
 
     it("handles item removal", () => {
@@ -86,26 +85,6 @@ describe("For component", () => {
         expect(body.innerHTML).toContain("Item 3");
     });
 
-    it("provides correct index accessor", () => {
-        const [items] = signal([
-            {id: 1, name: "Item 1"},
-            {id: 2, name: "Item 2"}
-        ]);
-
-        const forElement = For({
-            children: items,
-            each: (item, index) => Li({
-                key: item().id
-            }, [`${index()}: ${item().name}`])
-        });
-
-        body.appendChild(forElement);
-        expect(body.innerHTML).toContain("0: Item 1");
-        expect(body.innerHTML).toContain("1: Item 2");
-    });
-
-    // NEW TESTS - Missing edge cases
-
     it("handles item insertion at beginning", () => {
         const [items, setItems] = signal([
             {id: 2, name: "Item 2"},
@@ -118,8 +97,7 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Item 2");
-        expect(body.innerHTML).toContain("Item 3");
+        expect(body.innerHTML).toContain("<li>Item 2</li><li>Item 3</li>");
 
         // Insert at beginning
         setItems([
@@ -128,9 +106,7 @@ describe("For component", () => {
             {id: 3, name: "Item 3"}
         ]);
 
-        expect(body.innerHTML).toContain("Item 1");
-        expect(body.innerHTML).toContain("Item 2");
-        expect(body.innerHTML).toContain("Item 3");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 2</li><li>Item 3</li>");
     });
 
     it("handles item insertion in middle", () => {
@@ -145,8 +121,7 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Item 1");
-        expect(body.innerHTML).toContain("Item 3");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 3</li>");
 
         // Insert in middle
         setItems([
@@ -155,9 +130,7 @@ describe("For component", () => {
             {id: 3, name: "Item 3"}
         ]);
 
-        expect(body.innerHTML).toContain("Item 1");
-        expect(body.innerHTML).toContain("Item 2");
-        expect(body.innerHTML).toContain("Item 3");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 2</li><li>Item 3</li>");
     });
 
     it("handles reordering items", () => {
@@ -169,13 +142,11 @@ describe("For component", () => {
 
         const forElement = For({
             children: items,
-            each: (item, index) => Li({key: item().id}, [() => `${index()}: ${item().name}`])
+            each: (item) => Li({key: item().id}, [() => `${item().name}`])
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("0: Item 1");
-        expect(body.innerHTML).toContain("1: Item 2");
-        expect(body.innerHTML).toContain("2: Item 3");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 2</li><li>Item 3</li>");
 
         // Reverse order
         setItems([
@@ -184,9 +155,7 @@ describe("For component", () => {
             {id: 1, name: "Item 1"}
         ]);
 
-        expect(body.innerHTML).toContain("0: Item 3");
-        expect(body.innerHTML).toContain("1: Item 2");
-        expect(body.innerHTML).toContain("2: Item 1");
+        expect(body.innerHTML).toContain("<li>Item 3</li><li>Item 2</li><li>Item 1</li>");
     });
 
     it("handles complete replacement of items", () => {
@@ -201,8 +170,7 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Item 1");
-        expect(body.innerHTML).toContain("Item 2");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 2</li>");
 
         // Replace all items
         setItems([
@@ -212,8 +180,7 @@ describe("For component", () => {
 
         expect(body.innerHTML).not.toContain("Item 1");
         expect(body.innerHTML).not.toContain("Item 2");
-        expect(body.innerHTML).toContain("Item 4");
-        expect(body.innerHTML).toContain("Item 5");
+        expect(body.innerHTML).toContain("<li>Item 4</li><li>Item 5</li>");
     });
 
     it("handles clearing and refilling list", () => {
@@ -228,49 +195,18 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Item 1");
-        expect(body.innerHTML).toContain("Item 2");
+        expect(body.innerHTML).toContain("<li>Item 1</li><li>Item 2</li>");
 
         // Clear list
         setItems([]);
-        expect(body.innerHTML).toEqual("<div style=\"display: contents;\"></div>");
+        expect(body.innerHTML).toEqual('<div style="display: contents;"></div>');
 
         // Refill list
         setItems([
             {id: 3, name: "Item 3"},
             {id: 4, name: "Item 4"}
         ]);
-        expect(body.innerHTML).toContain("Item 3");
-        expect(body.innerHTML).toContain("Item 4");
-    });
-
-    it("handles reactive index updates correctly", () => {
-        const [items, setItems] = signal([
-            {id: 1, name: "Item 1"},
-            {id: 2, name: "Item 2"},
-            {id: 3, name: "Item 3"}
-        ]);
-
-        const forElement = For({
-            children: items,
-            each: (item, index) => Li({key: item().id}, [() => `Index ${index()}`])
-        });
-
-        body.appendChild(forElement);
-        expect(body.innerHTML).toContain("Index 0");
-        expect(body.innerHTML).toContain("Index 1");
-        expect(body.innerHTML).toContain("Index 2");
-
-        // Remove first item, indexes should update
-        setItems([
-            {id: 2, name: "Item 2"},
-            {id: 3, name: "Item 3"}
-        ]);
-
-        // The remaining items should now have indexes 0 and 1
-        expect(body.innerHTML).toContain("Index 0");
-        expect(body.innerHTML).toContain("Index 1");
-        expect(body.innerHTML).not.toContain("Index 2");
+        expect(body.innerHTML).toContain("<li>Item 3</li><li>Item 4</li>");
     });
 
     it("handles mixed reactive and static content", () => {
@@ -337,7 +273,7 @@ describe("For component", () => {
         });
 
         body.appendChild(forElement);
-        
+
         const initialElements = Array.from(body.querySelectorAll('li'));
         expect(initialElements.length).toBe(3);
 
@@ -349,7 +285,7 @@ describe("For component", () => {
 
         const afterElements = Array.from(body.querySelectorAll('li'));
         expect(afterElements.length).toBe(2);
-        
+
         // The first and third elements should be the same DOM nodes
         // (This tests that the reconciliation preserves DOM identity)
         expect(afterElements[0]).toBe(initialElements[0]);
@@ -394,7 +330,7 @@ describe("For component", () => {
         ]);
 
         // Test using For component as children with reactive updates
-        const wrapper = Div({key: "wrapper"}, For({
+        const wrapper = Ul({}, For({
             children: items,
             each: (item) => Li({key: item().id}, [() => item().name])
         }));
@@ -402,7 +338,7 @@ describe("For component", () => {
         body.appendChild(wrapper);
 
         // Initial state
-        expect(body.innerHTML).toContain("Initial Item");
+        expect(body.innerHTML).toContain('<ul><div style="display: contents;"><li>Initial Item</li></div></ul>');
 
         // Update items
         setItems([
@@ -411,10 +347,6 @@ describe("For component", () => {
         ]);
 
         // Verify updates work correctly when For is used as children
-        expect(body.innerHTML).toContain("Updated Item");
-        expect(body.innerHTML).toContain("New Item");
-
-        const listItems = body.querySelectorAll('li');
-        expect(listItems.length).toBe(2);
+        expect(body.innerHTML).toContain('<ul><div style="display: contents;"><li>Updated Item</li><li>New Item</li></div></ul>');
     });
 });

@@ -39,7 +39,7 @@ describe("dom", () => {
   it("create a div element with reactive properties", () => {
     const element = h("div", {
       className: () => "test",
-      style: () => ({ padding: "5px" }),
+      style: { padding: () => "5px" },
     });
     body.appendChild(element);
 

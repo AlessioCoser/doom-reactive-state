@@ -1,5 +1,4 @@
-import { Button, Div, H2, P, d, derive, effect, h, signal } from "doom-reactive-state"
-import { Signal } from "doom-reactive-state/reactivity/types"
+import { Button, Div, H2, P, d, derive, effect, h, signal, Signal, For } from "doom-reactive-state"
 
 type MainProps = { counter: Signal<number> }
 const Main = ({ counter }: MainProps) => {
@@ -50,11 +49,14 @@ const Main = ({ counter }: MainProps) => {
       // we can avoid the element reacting for a specific property. we can pass the string directly without any function
       Div(`Initial Text ${btnText()}`),
       // but since the state accessor is a function you can pass it directly and still react to it's change like isLoading
-      Button({ style: { display: 'block' }, disabled: isLoading, onclick }, `increase`),
+      Button({ style: { display: 'block' }, disabled: isLoading, onclick }, [`increase`]),
       // wrapping in a function it will react to the btnText change
       Div(() => `Updated Text ${btnText()}`),
-      // children array can also be reactive when wrapped in a function
-      Div(() => history().map((it) => h("p", it.toString())))
+      // to make children to be reactive Use For component and must use keyed elements
+      Div(For({ items: history, each: (it) => {
+        console.log("rendering history [", it(), ']');
+        return P({ key: it() }, d`${it}`)
+      } }))
     ])
   ])
 }

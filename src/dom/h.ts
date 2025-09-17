@@ -26,8 +26,9 @@ export function h<K extends keyof HTMLTag>(component: K, a: unknown, b?: unknown
   const { style, properties: props } = extractStyle(doomProperties);
   const { events, properties } = extractEvents(props);
 
-  if (key) {
-    (el as any).key = key;
+  const keyValue = `${key}`
+  if (keyValue.length > 0) {
+    (el as any).key = keyValue
   }
 
   Object.entries(properties)
@@ -162,7 +163,7 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   }
 
   if (!b) {
-    if (Array.isArray(a) || typeof a === "string" || typeof a === "function") {
+    if (Array.isArray(a) || typeof a === "string" || typeof a === "function" || a instanceof Element) {
       return { properties: {} as DoomProperties<K>, children: a as Children };
     } else {
       return { properties: a as DoomProperties<K>, children: [] as Children };

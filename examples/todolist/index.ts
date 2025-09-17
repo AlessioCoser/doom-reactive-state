@@ -1,5 +1,4 @@
-import { Div, Input, Li, signal, Ul } from "doom-reactive-state"
-import type { Accessor, Component } from "doom-reactive-state"
+import {Accessor, Div, For, Input, Li, signal, Ul} from "doom-reactive-state"
 
 type Item = { id: number, text: string, done: boolean }
 
@@ -9,21 +8,29 @@ function newItem(text: string, identifier: number | null = null, done: boolean =
 }
 
 type ItemCallback = (id: Item['id']) => void
-type TodoItemProps = { item: Item, onclick: ItemCallback, onclose: ItemCallback }
-const TodoItem: Component<TodoItemProps> = ({item, onclick, onclose}) => {
-    const doneClass = () => item.done ? "done" : ""
-
-    return Li({className: doneClass, onclick: () => onclick(item.id)}, [
-        Div({id: `${item.id}`}, () => item.text),
-        Div({className: "delete", onclick: () => onclose(item.id)}, 'ⓧ')
+type TodoItemProps = { item: Accessor<Item>, onclick: ItemCallback, onclose: ItemCallback }
+const TodoItem = ({item, onclick, onclose}: TodoItemProps) => {
+    return Li({
+        key: item().id,
+        className: () => item().done ? "done" : "",
+        onclick: () => onclick(item().id)
+    }, [
+        Div(() => item().text),
+        Div({className: "delete", onclick: () => onclose(item().id)}, 'ⓧ')
     ]);
 }
 
 type TodoListProps = { items: Accessor<Item[]>, onItemClick: ItemCallback, onItemClose: ItemCallback }
-const TodoList: Component<TodoListProps> = ({items, onItemClick, onItemClose}) => {
-    return Ul(() => items().map((item: Item) =>
-        TodoItem({item, onclick: onItemClick, onclose: onItemClose})
-    ))
+const TodoList = ({items, onItemClick, onItemClose}: TodoListProps) => {
+    return Ul(For({
+            items: items,
+            each: (item) => TodoItem({
+                item,
+                onclick: onItemClick,
+                onclose: onItemClose
+            })
+        })
+    )
 }
 
 const App = () => {

@@ -23,7 +23,7 @@ type WritableCSSStyleDeclaration = WritablePart<CSSStyleDeclaration>
 type StylesDeclaration = Omit<WritableCSSStyleDeclaration, FunctionPropertyNames<WritableCSSStyleDeclaration>>
 export type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
 export type Style = {key: keyof Styles, value: Styles[keyof Styles]}
-type PartialWithStyles<T> = Partial<T & { style: Reactive<Styles> }>
+type PartialWithStyles<T> = Partial<Omit<T, 'style'> & { style: Styles }>
 
 type ElementWithoutEvents<T extends keyof HTMLTag> = Omit<HTMLTag[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
 type ElementProperties<T extends keyof HTMLTag> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>

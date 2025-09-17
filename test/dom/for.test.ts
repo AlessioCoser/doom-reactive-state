@@ -12,12 +12,27 @@ describe("For component", () => {
         const [items] = signal<{ id: number, name: string }[]>([]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
         body.appendChild(forElement);
         expect(body.innerHTML).toEqual('<div style="display: contents;"></div>');
+    });
+
+    it("renders an item with key 0", () => {
+        const [items, setItems] = signal<{ id: number, name: string }[]>([]);
+
+        const forElement = For({
+            items: items,
+            each: (item) => Li({key: item().id}, [item().name])
+        });
+
+        body.appendChild(forElement);
+
+        setItems([{id: 0, name: "Zero"}])
+
+        expect(body.innerHTML).toEqual('<div style="display: contents;"><li>Zero</li></div>');
     });
 
     it("renders initial items", () => {
@@ -27,7 +42,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -42,7 +57,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [() => item().name])
         });
 
@@ -65,7 +80,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -92,7 +107,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -116,7 +131,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -141,7 +156,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [() => `${item().name}`])
         });
 
@@ -165,7 +180,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -190,7 +205,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -215,7 +230,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [
                 "Static: ",
                 () => item().name,
@@ -242,11 +257,11 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: categories,
+            items: categories,
             each: (category) => Div({key: category().id}, [
                 () => category().name,
                 For({
-                    children: () => category().items,
+                    items: () => category().items,
                     each: (item) => Li({key: item().id}, [() => item().name])
                 })
             ])
@@ -268,7 +283,7 @@ describe("For component", () => {
         ]);
 
         const forElement = For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         });
 
@@ -301,7 +316,7 @@ describe("For component", () => {
 
         // Test using For component as the second argument (children) of h()
         const container = Div({key: "container"}, For({
-            children: items,
+            items: items,
             each: (item) => Li({key: item().id}, [item().name])
         }));
 
@@ -329,24 +344,20 @@ describe("For component", () => {
             {id: 1, name: "Initial Item"}
         ]);
 
-        // Test using For component as children with reactive updates
-        const wrapper = Ul({}, For({
-            children: items,
+        const wrapper = Ul(For({
+            items: items,
             each: (item) => Li({key: item().id}, [() => item().name])
         }));
 
         body.appendChild(wrapper);
 
-        // Initial state
         expect(body.innerHTML).toContain('<ul><div style="display: contents;"><li>Initial Item</li></div></ul>');
 
-        // Update items
         setItems([
             {id: 1, name: "Updated Item"},
             {id: 2, name: "New Item"}
         ]);
 
-        // Verify updates work correctly when For is used as children
         expect(body.innerHTML).toContain('<ul><div style="display: contents;"><li>Updated Item</li><li>New Item</li></div></ul>');
     });
 });

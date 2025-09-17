@@ -4,7 +4,7 @@ import { KeyedElement, KeyValue } from "./types";
 import { updateChildren } from "./updateChildren";
 
 type ForProps<T> = {
-  children: Accessor<T[]>
+  items: Accessor<T[]>
   each: (item: Accessor<T>) => KeyedElement
 }
 
@@ -16,7 +16,7 @@ export function For<T>(props: ForProps<T>): Element {
     let prev: ChildNode[] = [];
 
     effect(() => {
-        const items = props.children();
+        const items = props.items();
         if (items.length === 0) {
             itemSignals.clear();
             prev = updateChildren(container, prev, []);

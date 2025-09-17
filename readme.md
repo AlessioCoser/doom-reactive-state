@@ -75,7 +75,7 @@ You can load the script from the github release url and start use it right away.
 <html>
   <head>
     <!-- other stuff -->
-    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.1.4/doom-reactive-state.global.js"></script>
+    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.5.0/doom-reactive-state.global.js"></script>
   </head>
   <body>
     <script type="application/javascript">

@@ -12,6 +12,9 @@
     "dev": "vite",
     "build": "rm -rf dist && rm -rf cdn && tsup",
     "release": "npm run build && ./publish.sh $1",
+    "example:async-counter": "cd examples/async-counter-typescript && npm start",
+    "example:reactive-state": "cd examples/reactive-state-nodejs && npm start",
+    "example:simple-counter": "cd examples/simple-counter-javascript && npm start",
     "example:todolist": "cd examples/todolist && npm start"
   },
   "author": "Alessio Coser",

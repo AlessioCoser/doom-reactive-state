@@ -1,4 +1,4 @@
-import {Accessor, Div, For, Input, Li, signal, Ul} from "doom-reactive-state"
+import {Accessor, toChildren, Div, Input, Li, signal, Ul} from "doom-reactive-state"
 
 type Item = { id: number, text: string, done: boolean }
 
@@ -22,15 +22,7 @@ const TodoItem = ({item, onclick, onclose}: TodoItemProps) => {
 
 type TodoListProps = { items: Accessor<Item[]>, onItemClick: ItemCallback, onItemClose: ItemCallback }
 const TodoList = ({items, onItemClick, onItemClose}: TodoListProps) => {
-    return Ul(For({
-            items: items,
-            each: (item) => TodoItem({
-                item,
-                onclick: onItemClick,
-                onclose: onItemClose
-            })
-        })
-    )
+    return Ul(toChildren(items, (item) => TodoItem({ item, onclick: onItemClick, onclose: onItemClose })))
 }
 
 const App = () => {

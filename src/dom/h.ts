@@ -1,4 +1,5 @@
-import { effect } from "../reactivity";
+import {effect} from "../reactivity";
+import {ReactiveChildren} from "./reactiveChildren";
 import {
   Child,
   Children,
@@ -125,11 +126,14 @@ function addChildren<K extends keyof HTMLTag>(
   el: HTMLTag[K],
   children: Children | undefined
 ) {
-  if (Array.isArray(children)) {
-    children.map(toChildNode).map(appendTo(el));
-  } else if (children) {
-    appendTo(el)(toChildNode(children));
+  if (!children) return;
+  if (children instanceof ReactiveChildren) {
+    return children.applyTo(el);
   }
+  if (Array.isArray(children)) {
+    return children.map(toChildNode).forEach(appendTo(el));
+  }
+  appendTo(el)(toChildNode(children));
 }
 
 function appendTo<K extends keyof HTMLTag>(
@@ -163,7 +167,7 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   }
 
   if (!b) {
-    if (Array.isArray(a) || typeof a === "string" || typeof a === "function" || a instanceof Element) {
+    if (Array.isArray(a) || typeof a === "string" || typeof a === "function" || a instanceof Element || a instanceof ReactiveChildren) {
       return { properties: {} as DoomProperties<K>, children: a as Children };
     } else {
       return { properties: a as DoomProperties<K>, children: [] as Children };

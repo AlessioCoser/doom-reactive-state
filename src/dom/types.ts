@@ -1,4 +1,5 @@
-import type { Accessor } from "../reactivity"
+import type { Accessor } from "../reactivity";
+import { ReactiveChildren } from "./reactiveChildren";
 
 export type HTMLTag = HTMLElementTagNameMap
 export type Component<P> = (props: P, children?: Children) => Element
@@ -6,7 +7,7 @@ export type HTMLComponent<P extends keyof HTMLTag> = <T extends DoomProperties<P
     props?: T,
     children?: Children
 ) => T extends KeyedDoomProperties<P> ? KeyedElement : Element;
-export type Children = Child[] | Child
+export type Children = Child[] | Child | ReactiveChildren<any>
 export type Child = Element | Reactive<string>
 export type Reactive<T> = T | Accessor<T>
 

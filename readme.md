@@ -21,8 +21,9 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 6. :hatching_chick: Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
 7. :lipstick: Some helper functions to easily create common reactive HTMLElement such as `Div`, `P` and `Span`.
 
-## Examples
-You can find some examples here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
+## Examples & Docs
+- You can find **some examples** here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
+- You can find the **full documentation** here: [Documentation](#documentation)
 
 ## Install
 Use your preferred package manager:
@@ -75,7 +76,7 @@ You can load the script from the github release url and start use it right away.
 <html>
   <head>
     <!-- other stuff -->
-    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.5.0/doom-reactive-state.global.js"></script>
+    <script src="https://github.com/AlessioCoser/doom-reactive-state/releases/download/1.5.1/doom-reactive-state.global.js"></script>
   </head>
   <body>
     <script type="application/javascript">
@@ -89,6 +90,180 @@ You can load the script from the github release url and start use it right away.
 </html>
 ```
 
+# Documentation
+
+## Core Concepts: Reactivity
+
+The reactivity system is built on three main primitives: `signal`, `effect`, and `derive`.
+
+### `signal(initialValue)`
+A signal is the fundamental building block for reactive state. 
+It holds a value and notifies its subscribers when that value changes. 
+Calling `signal` returns a tuple containing a getter and a setter function.
+
+- **Getter**: A function that returns the current value. Accessing the value within an `effect` or `derive` will subscribe to its changes.
+- **Setter**: A function that updates the signal's value and triggers any dependent effects or derivations.
+
+```typescript
+import { signal, effect } from "doom-reactive-state";
+
+const [count, setCount] = signal(0); // Create a signal with an initial value of 0
+
+console.log(count()); // Prints: 0
+setCount(10); // Update the value to 10
+console.log(count()); // Prints: 10
+```
+
+### `effect(fn)`
+
+An effect is a function that automatically re-runs whenever the signals it depends on are updated.
+It's ideal for side effects like logging, data fetching, or manual DOM manipulations.
+
+
+```typescript
+import { signal, effect } from "doom-reactive-state";
+
+const [firstName, setFirstName] = signal("John");
+const [lastName, setLastName] = signal("Doe");
+
+effect(() => console.log(`${firstName()} ${lastName()}`)); // Prints "John Doe"
+
+setFirstName("Bob"); // Prints: "Bob Doe"
+```
+
+### `derive(fn)`
+
+A derived signal (or computed signal) creates a new signal whose value is calculated from other signals.
+It is both reactive itself and memoized, meaning it only re-computes its value when one of its dependencies changes.
+
+```typescript
+const [count, setCount] = signal(1);
+const double = derive(() => count() * 2);
+
+console.log(double()); // Prints: 2
+setCount(5);
+console.log(double()); // Prints: 10
+```
+
+### `d\`...\`` (Template Literal)
+
+The `d` tagged template literal is a convenient shorthand for creating
+a derived signal that combines strings and reactive signals.
+
+```typescript
+const [count, setCount] = signal(14);
+const fontSize = d`${count}px`;
+
+console.log(fontSize()); // Prints: "14px"
+setCount(20);
+console.log(fontSize()); // Prints: "20px"
+```
+
+## DOM Rendering
+
+The library provides a function `h` (and HTML tag helpers like `Div`, `P`, `Ul`, `Li`) to create DOM elements with reactive capabilities.
+
+### `h(tag, properties, children)`
+
+This is the core function for creating an `HTMLElement`.
+
+-   `tag`: The HTML tag name (e.g., `'div'`).
+-   `properties`: An optional object for attributes, styles, and event listeners.
+-   `children`: An optional array of child nodes (elements, strings, or reactive functions).
+
+### Properties
+
+Properties can be static or reactive.
+**To make a property reactive, pass a function that returns the desired value.**
+
+The reactivity is fine-grained on every property, meaning only the properties that depend on signals will be updated when those signals change.
+
+```typescript
+import { signal, h } from "doom-reactive-state";
+
+const [isDone, setIsDone] = signal(false);
+const [color, setColor] = signal("blue");
+
+const element = h(
+  "div",
+  {
+    className: () => (isDone() ? "done" : "pending"), // Reactive className
+    style: {
+      color: () => color(), // Reactive style color property
+      fontSize: "16px", // Static style fontSize property
+    },
+    onclick: () => setIsDone(!isDone()), // Event handler
+  },
+  "Click me to toggle status"
+);
+
+document.body.appendChild(element);
+```
+
+### Children
+The `h` function accepts children in several forms, allowing for both static content and powerful, fine-grained reactivity.
+
+#### Static and Reactive Children
+
+You can provide a single child or an array of children. The library intelligently handles each type:
+- **Static Text**: Plain strings are rendered once and remain static.
+- **Reactive Text**: A function that returns a string (e.g., () => \Count: ${count()}``) creates a reactive text node. This node will automatically update in the DOM whenever a signal it depends on changes, without re-rendering the entire component.
+- **Element**: An HTMLElement created with `h` is statically added to the dom. It is inherently reactive if it uses at least one signal in one of its properties.
+- **Array**: You can pass an array containing any combination of the above types. The array will ever be statically rendered, but individual elements within it can be reactive.
+
+```typescript
+import { signal, h } from "doom-reactive-state";
+
+const [count, setCount] = signal(0);
+
+const counterDisplay = h("div", [ // Static array of elements
+  "The current count is: ", // Static text node
+  () => `${count()}`,       // Reactive text node
+  h("button", { onclick: () => setCount(c => c + 1) }, "+") // Static element with single static child
+]);
+
+document.body.appendChild(counterDisplay);
+```
+
+#### Reactive Array of children
+Passing a standard JavaScript array as children creates a static list.
+The framework will not react to items being added, removed, or reordered in that array after the initial render.
+
+To render a dynamic list that efficiently updates, you must use the `toChildren` helper.
+This function is designed to work with a signal that holds an array, applying a mapping function to transform each item into a DOM element.
+
+Keying is crucial for performance. And enforced within the typing system. When rendering a list with `toChildren`, you must provide a unique key property for each element.
+
+This key allows the reconciliation algorithm to identify, reorder, and preserve elements across updates, preventing unnecessary DOM node re-creation and dramatically improving performance.
+
+```typescript
+import { signal, Ul, Li, toChildren } from "doom-reactive-state";
+
+const Example = () => {
+   const [items, setItems] = signal([
+      {id: 1, text: "First"},
+      {id: 2, text: "Second"},
+   ]);
+
+   const updateItems = () => setItems([
+      {id: 2, text: "Second"}, // moved at the top
+      {id: 1, text: "First"},
+      {id: 3, text: "Third"}, // added at the end
+   ])
+
+   return Div([
+      Ul(toChildren(items, (item) => Li({key: item().id}, [() => item().text]))),
+      Button({ onclick: updateItems }, 'update array')
+   ])
+}
+
+document.body.appendChild(Example());
+
+// After the button click the DOM will be efficiently updated:
+// - The element with key 2 is moved to the first position.
+// - A new element with key 3 is created and appended.
+```
+
 # Contributing
 
 ## Run Tests
@@ -97,7 +272,7 @@ npm test
 ```
 
 ## Run Dev
-this runs an application present in dev folder with vite
+this runs an application present in the dev folder with vite
 ```
 npm run dev
 ```

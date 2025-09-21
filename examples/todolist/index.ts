@@ -1,4 +1,4 @@
-import {Accessor, toChildren, Div, Input, Li, signal, Ul} from "doom-reactive-state"
+import {Accessor, toChildren, Div, Input, Li, signal, Ul, If} from "doom-reactive-state"
 
 type Item = { id: number, text: string, done: boolean }
 
@@ -54,7 +54,11 @@ const App = () => {
 
     return Div([
         Input({type: 'text', onkeyup, placeholder: "Press enter to create"}),
-        TodoList({items, onItemClick, onItemClose})
+        Div(If(
+            () => items().length === 0,
+            () => Div({className: "empty"}, "No items, add some!"),
+            () => TodoList({items, onItemClick, onItemClose})
+        ))
     ])
 }
 

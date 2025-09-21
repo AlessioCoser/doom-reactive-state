@@ -1,7 +1,6 @@
-import { effect, signal } from "../reactivity";
-import { Accessor } from "../reactivity";
-import { KeyedElement, KeyValue } from "./types";
-import { updateChildren } from "./updateChildren";
+import {Accessor, effect, signal} from "../reactivity";
+import {KeyedElement, KeyValue} from "./types";
+import {updateChildren} from "./updateChildren";
 
 export class ReactiveChildren<T> {
   constructor(

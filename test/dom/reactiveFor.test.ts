@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { toChildren, Div, Li, signal, Ul } from "../../src";
+import { For, Div, Li, signal, Ul } from "../../src";
 
 const body = document.body;
 
-describe("ReactiveChildren", () => {
+describe("ReactiveFor", () => {
   beforeEach(() => {
     body.innerHTML = "";
   });
@@ -12,7 +12,7 @@ describe("ReactiveChildren", () => {
     const [items] = signal<{ id: number; name: string }[]>([]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -23,7 +23,7 @@ describe("ReactiveChildren", () => {
     const [items, setItems] = signal<{ id: number; name: string }[]>([]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -42,7 +42,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -54,7 +54,7 @@ describe("ReactiveChildren", () => {
     const [items, setItems] = signal([{ id: 1, name: "Item 1" }]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [() => item().name]))
+      For(items, (item) => Li({ key: item().id }, [() => item().name]))
     );
 
     body.appendChild(forElement);
@@ -76,7 +76,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -102,7 +102,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -127,7 +127,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -153,7 +153,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) =>
+      For(items, (item) =>
         Li({ key: item().id }, [() => `${item().name}`])
       )
     );
@@ -182,7 +182,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -206,7 +206,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -230,7 +230,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => {
+      For(items, (item) => {
         return Li({ key: item().id }, [
           "Static: ",
           () => item().name,
@@ -263,11 +263,11 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(categories, (category) => {
+      For(categories, (category) => {
         return Div({ key: category().id }, [
           () => category().name,
           Ul(
-            toChildren(
+            For(
               () => category().items,
               (item) => Li({ key: item().id }, [() => item().name])
             )
@@ -292,7 +292,7 @@ describe("ReactiveChildren", () => {
     ]);
 
     const forElement = Ul(
-      toChildren(items, (item) => Li({ key: item().id }, [item().name]))
+      For(items, (item) => Li({ key: item().id }, [item().name]))
     );
 
     body.appendChild(forElement);
@@ -318,7 +318,7 @@ describe("ReactiveChildren", () => {
   it("can be used as children in h() function with reactive updates", () => {
     const [items, setItems] = signal([{ id: 1, name: "Initial Item" }]);
 
-    const wrapper = Ul(toChildren(items, (item) => Li({ key: item().id }, [() => item().name])));
+    const wrapper = Ul(For(items, (item) => Li({ key: item().id }, [() => item().name])));
 
     body.appendChild(wrapper);
 

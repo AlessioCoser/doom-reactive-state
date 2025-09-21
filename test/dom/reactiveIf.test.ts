@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { toChildren, Div, Li, signal, Ul, If } from "../../src";
+import { For, Div, Li, signal, Ul, If } from "../../src";
 
 const body = document.body;
 
@@ -46,7 +46,7 @@ describe("ReactiveIf", () => {
     const container = document.createElement("div");
     const ifComp = If(
       cond,
-      () => Ul(toChildren(items, (item) => Li({ key: item().id }, [item().name]))),
+      () => Ul(For(items, (item) => Li({ key: item().id }, [item().name]))),
       () => Div({}, ["No items"])
     );
     ifComp.applyTo(container);
@@ -66,7 +66,7 @@ describe("ReactiveIf", () => {
     const ifComp = If(
       cond,
       () => Div({}, ["No items"]),
-      () => Ul(toChildren(items, (item) => Li({ key: item().id }, [item().name])))
+      () => Ul(For(items, (item) => Li({ key: item().id }, [item().name])))
     );
     ifComp.applyTo(container);
     expect(container.innerHTML).toContain("A");
@@ -84,7 +84,7 @@ describe("ReactiveIf", () => {
     const container = document.createElement("div");
     const ifComp = If(
       cond,
-      () => Ul(toChildren(items, (item) => Li({ key: item().id }, [item().name]))),
+      () => Ul(For(items, (item) => Li({ key: item().id }, [item().name]))),
       () => Div({}, ["No items"])
     );
     ifComp.applyTo(container);

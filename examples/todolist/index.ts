@@ -22,7 +22,7 @@ const TodoItem = ({item, onclick, onclose}: TodoItemProps) => {
 
 type TodoListProps = { items: Accessor<Item[]>, onItemClick: ItemCallback, onItemClose: ItemCallback }
 const TodoList = ({items, onItemClick, onItemClose}: TodoListProps) => {
-    return Ul(toChildren(items, (item) => TodoItem({ item, onclick: onItemClick, onclose: onItemClose })))
+    return Ul(For(items, (item) => TodoItem({ item, onclick: onItemClick, onclose: onItemClose })))
 }
 
 const App = () => {

@@ -2,7 +2,14 @@ import {Accessor, effect, signal} from "../reactivity";
 import {KeyedElement, KeyValue} from "./types";
 import {updateChildren} from "./updateChildren";
 
-export class ReactiveChildren<T> {
+export function For<T>(
+    items: Accessor<T[]>,
+    each: (item: Accessor<T>) => KeyedElement
+){
+  return new ReactiveFor(items, each);
+}
+
+export class ReactiveFor<T> {
   constructor(
     private readonly items: Accessor<T[]>,
     private readonly each: (item: Accessor<T>) => KeyedElement
@@ -53,11 +60,4 @@ export class ReactiveChildren<T> {
       prev = updateChildren(container, prev, next);
     });
   }
-}
-
-export function toChildren<T>(
-  items: Accessor<T[]>,
-  each: (item: Accessor<T>) => KeyedElement
-){
-  return new ReactiveChildren(items, each);
 }

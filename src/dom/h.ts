@@ -32,7 +32,7 @@ export function h<K extends keyof HTMLTag>(component: K, a: unknown, b?: unknown
 
   forEach(properties, (key, prop) => reactOn(prop, (newProp) => ((el as any)[key] = newProp)))
   forEach(style, (key, value) => reactOn(value, (newValue) =>  ((el.style as any)[key] = newValue)))
-  forEach(events, (key, handler) => ((el as any)[key] = pass(handler)))
+  forEach(events, (key, handler) => ((el as any)[key] = handler))
 
   addChildren(el, children as Children);
 
@@ -120,20 +120,21 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   return { properties: a as DoomProperties<K>, children: b as Children };
 }
 
-function reactOn<T>(prop: Reactive<T>, apply: (next: T) => void) {
-  let prev: T;
-  effect(() => {
-    const next = evaluate(prop);
-    if (next !== prev) {
-      apply(next);
-      prev = next;
-    }
-  });
-}
+function reactOn<T>(value: Reactive<T>, apply: (next: T) => void) {
+  if (typeof value !== "function") {
+    apply(value);
+    return;
+  }
 
-const pass = <T>(prop: Reactive<T>): T => prop as T;
-const evaluate = <T>(prop: Reactive<T>): T =>
-    typeof prop !== "function" ? prop : (prop as Function)();
+  let prevValue: T;
+  effect(() => {
+    const newValue = (value as Function)()
+    if (newValue !== prevValue) {
+      apply(newValue)
+      prevValue = newValue
+    }
+  })
+}
 
 function forEach<T>(object: T, fn: (key: keyof T, value: T[keyof T]) => void) {
   if (object) {

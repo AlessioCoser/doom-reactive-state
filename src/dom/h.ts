@@ -3,17 +3,15 @@ import {ReactiveChildren} from "./reactiveChildren";
 import {
   Child,
   Children,
-  DoomEvents,
   DoomProperties,
   DoomPropertiesNoStyle,
   DoomPropertiesNoStyleNoEvents,
-  DoomProperty,
+  DoomProperty, ElementEvents,
   HTMLTag,
   KeyedDoomProperties,
   KeyedElement,
   KeyValue,
   Reactive,
-  Style,
   Styles,
 } from "./types";
 
@@ -32,64 +30,33 @@ export function h<K extends keyof HTMLTag>(component: K, a: unknown, b?: unknown
     (el as any).key = keyValue
   }
 
-  Object.entries(properties)
-    .forEach(([key, prop]) => reactOn(prop, (newProp) => ((el as any)[key] = newProp)))
-
-  Object.entries(events)
-    .forEach(([key, handler]) => ((el as any)[key] = pass(handler)))
-
-  applyStyles(el, style);
+  forEach(properties, (key, prop) => reactOn(prop, (newProp) => ((el as any)[key] = newProp)))
+  forEach(style, (key, value) => reactOn(value, (newValue) =>  ((el.style as any)[key] = newValue)))
+  forEach(events, (key, handler) => ((el as any)[key] = pass(handler)))
 
   addChildren(el, children as Children);
 
   return el;
 }
 
-function applyStyles<K extends keyof HTMLTag>(
-  el: HTMLTag[K],
-  style: Reactive<Styles> | undefined
-) {
-  if (style) {
-    let prevStyles: Styles | undefined;
-    effect(() => {
-      const styles = evaluate(style) || {};
-      const newStyles: Styles = {};
-      toStyles(styles).forEach((style) => {
-        const newStyleKey = style.key;
-        const newStyleValue = evaluate(style.value) || "";
-        newStyles[newStyleKey] = newStyleValue;
-        if (!prevStyles || prevStyles[newStyleKey] !== newStyleValue) {
-          (el.style as any)[newStyleKey] = newStyleValue;
-        }
-      });
-      if (prevStyles) {
-        for (const k of Object.keys(prevStyles)) {
-          if (!(k in newStyles)) (el.style as any)[k] = "";
-        }
-      }
-      prevStyles = newStyles;
-    });
-  }
-}
-
 function extractEvents<K extends keyof HTMLTag>(
   props: DoomPropertiesNoStyle<K>
 ) {
-  const entries = Object.entries(props) as [keyof DoomPropertiesNoStyle<K>, DoomProperty<K>][]
+  const entries = Object.entries(props) as unknown as [keyof DoomPropertiesNoStyle<K>, DoomProperty<K>][]
   const events = entries.filter(([key]) => (key as String).startsWith("on"))
   const properties = entries.filter(([key]) => !(key as String).startsWith("on"))
   return {
-    events: Object.fromEntries(events) as DoomEvents<K>,
+    events: Object.fromEntries(events) as ElementEvents<K>,
     properties: Object.fromEntries(properties) as DoomPropertiesNoStyleNoEvents<K>,
   }
 }
 
 function extractStyle<K extends keyof HTMLTag>(props: DoomProperties<K>) {
   if (!('style' in props)) {
-    return { style: undefined, properties: props as DoomPropertiesNoStyle<K> }
+    return { style: {} as Styles, properties: props as DoomPropertiesNoStyle<K> }
   }
   const { style, ...properties } = props;
-  return { style: style as Reactive<Styles>, properties: properties as DoomPropertiesNoStyle<K> }
+  return { style: style as Styles, properties: properties as DoomPropertiesNoStyle<K> }
 }
 
 function extractKey<K extends keyof HTMLTag>(
@@ -109,17 +76,6 @@ function t(text: Reactive<string>): Text {
   const textNode = document.createTextNode("");
   reactOn(text, (newText) => (textNode.textContent = newText));
   return textNode;
-}
-
-function reactOn<T>(prop: Reactive<T>, apply: (next: T) => void) {
-  let prev: T;
-  effect(() => {
-    const next = evaluate(prop);
-    if (next !== prev) {
-      apply(next);
-      prev = next;
-    }
-  });
 }
 
 function addChildren<K extends keyof HTMLTag>(
@@ -145,21 +101,8 @@ function appendTo<K extends keyof HTMLTag>(
   };
 }
 
-function toStyles(styleValue: Styles): Style[] {
-  return Object.entries(styleValue).map((styleAttribute) => {
-    return {
-      key: styleAttribute[0] as Style["key"],
-      value: styleAttribute[1] as Style["value"],
-    };
-  });
-}
-
 const toChildNode = (child: Child) =>
   typeof child === "object" ? child : t(child);
-
-const pass = <T>(prop: Reactive<T>): T => prop as T;
-const evaluate = <T>(prop: Reactive<T>): T =>
-  typeof prop !== "function" ? prop : (prop as Function)();
 
 function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   if (!a && !b) {
@@ -175,4 +118,26 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
   }
 
   return { properties: a as DoomProperties<K>, children: b as Children };
+}
+
+function reactOn<T>(prop: Reactive<T>, apply: (next: T) => void) {
+  let prev: T;
+  effect(() => {
+    const next = evaluate(prop);
+    if (next !== prev) {
+      apply(next);
+      prev = next;
+    }
+  });
+}
+
+const pass = <T>(prop: Reactive<T>): T => prop as T;
+const evaluate = <T>(prop: Reactive<T>): T =>
+    typeof prop !== "function" ? prop : (prop as Function)();
+
+function forEach<T>(object: T, fn: (key: keyof T, value: T[keyof T]) => void) {
+  if (object) {
+    return Object.entries(object).forEach(([key, value]) => fn(key as keyof T, value as T[keyof T]))
+  }
+  return []
 }

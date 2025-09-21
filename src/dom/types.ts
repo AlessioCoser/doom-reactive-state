@@ -23,30 +23,19 @@ type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : ne
 type WritableCSSStyleDeclaration = WritablePart<CSSStyleDeclaration>
 type StylesDeclaration = Omit<WritableCSSStyleDeclaration, FunctionPropertyNames<WritableCSSStyleDeclaration>>
 export type Styles = { [K in keyof StylesDeclaration as K extends keyof StylesDeclaration ? K : never]?: Reactive<StylesDeclaration[K]> }
-export type Style = {key: keyof Styles, value: Styles[keyof Styles]}
-type PartialWithStyles<T> = Partial<Omit<T, 'style'> & { style: Styles }>
+type PartialWithoutStyles<T> = Partial<Omit<T, 'style'>>
 
 type ElementWithoutEvents<T extends keyof HTMLTag> = Omit<HTMLTag[T], keyof GlobalEventHandlers | FunctionPropertyNames<Element> | 'innerHTML' | 'innerText' | 'outerHTML' | 'outerText'>
-type ElementProperties<T extends keyof HTMLTag> = PartialWithStyles<WritablePart<ElementWithoutEvents<T>>>
+type ElementProperties<T extends keyof HTMLTag> = PartialWithoutStyles<WritablePart<ElementWithoutEvents<T>>>
 type ElementEventHandlers = Omit<GlobalEventHandlers, FunctionPropertyNames<Element>>
 type RemapThis<F, This> = F extends ((this: any, ...args: infer A) => infer R) | null ? ((this: This, ...args: A) => R) : F
-type ElementEvents<T extends keyof HTMLTag> = { [K in keyof ElementEventHandlers]?: RemapThis<ElementEventHandlers[K], HTMLTag[T]> }
+export type ElementEvents<T extends keyof HTMLTag> = { [K in keyof ElementEventHandlers]?: RemapThis<ElementEventHandlers[K], HTMLTag[T]> }
 
-type OmitEvents<T> = {
-  [K in keyof T as K extends `on${string}` ? never : K]: T[K]
-}
-
-type KeepOnlyEvents<T> = {
-  [K in keyof T as K extends `on${string}` ? K : never]: T[K]
-}
-
-export type DoomEvents<T extends keyof HTMLTag> = KeepOnlyEvents<DoomPropertiesNoStyle<T>>
-export type DoomPropertiesNoStyleNoEvents<T extends keyof HTMLTag> = OmitEvents<DoomPropertiesNoStyle<T>>
-export type DoomPropertiesNoStyle<T extends keyof HTMLTag> = Omit<DoomProperties<T>, 'style'>
-export type DoomProperties<T extends keyof HTMLTag> = {
+export type DoomPropertiesNoStyleNoEvents<T extends keyof HTMLTag> = {
   [K in keyof ElementProperties<T> as K extends keyof HTMLTag[T] ? K : never]?: Reactive<ElementProperties<T>[K]>
-} & ElementEvents<T>
-
+}
+export type DoomPropertiesNoStyle<T extends keyof HTMLTag> = DoomPropertiesNoStyleNoEvents<T> & ElementEvents<T>
+export type DoomProperties<T extends keyof HTMLTag> = DoomPropertiesNoStyle<T> &  { style?: Styles }
 export type KeyedDoomProperties<T extends keyof HTMLTag> = DoomProperties<T> & { key: KeyValue }
 
 export type DoomProperty<T extends keyof HTMLTag> = {

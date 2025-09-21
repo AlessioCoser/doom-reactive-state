@@ -17,9 +17,9 @@ Super simple reactive state management with fine-grained reactive DOM elements.
 2. :zap: No compilation required
 3. :surfer: Super-Easy reactive concepts (signal, effect, derive)
 4. :four_leaf_clover: No magic, you create components that are simple HTMLElements
-5. :blossom: Just a few lines of code
-6. :hatching_chick: Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
-7. :lipstick: Some helper functions to easily create common reactive HTMLElement such as `Div`, `P` and `Span`.
+5. :hatching_chick: Only a single HTMLElement wrapper to enable a **fine-grained reactivity** on Element properties
+6. :lipstick: Some helper functions to easily create common reactive HTMLElement such as `Div`, `P` and `Span`.
+7. :twisted_rightwards_arrows: Helper functions for reactive lists and conditional rendering: [`For`](#reactive-list-of-children) for efficient reactive lists, and [`If`](#conditional-rendering-with-if) for reactive conditional flows.
 
 ## Examples & Docs
 - You can find **some examples** here: [Examples](https://github.com/AlessioCoser/doom-reactive-state/tree/master/examples)
@@ -225,19 +225,19 @@ const counterDisplay = h("div", [ // Static array of elements
 document.body.appendChild(counterDisplay);
 ```
 
-#### Reactive Array of children
+#### Reactive list of children
 Passing a standard JavaScript array as children creates a static list.
 The framework will not react to items being added, removed, or reordered in that array after the initial render.
 
-To render a dynamic list that efficiently updates, you must use the `toChildren` helper.
+To render a reactive list that efficiently updates, you must use the `For` helper.
 This function is designed to work with a signal that holds an array, applying a mapping function to transform each item into a DOM element.
 
-Keying is crucial for performance. And enforced within the typing system. When rendering a list with `toChildren`, you must provide a unique key property for each element.
+Keying is crucial for performance. And enforced within the typing system. When rendering a list with `For`, you must provide a unique key property for each element.
 
 This key allows the reconciliation algorithm to identify, reorder, and preserve elements across updates, preventing unnecessary DOM node re-creation and dramatically improving performance.
 
 ```typescript
-import { signal, Ul, Li, toChildren } from "doom-reactive-state";
+import { signal, Ul, Li, For, Div, Button } from "doom-reactive-state";
 
 const Example = () => {
    const [items, setItems] = signal([
@@ -252,7 +252,7 @@ const Example = () => {
    ])
 
    return Div([
-      Ul(toChildren(items, (item) => Li({key: item().id}, [() => item().text]))),
+      Ul(For(items, (item) => Li({key: item().id}, [() => item().text]))),
       Button({ onclick: updateItems }, 'update array')
    ])
 }
@@ -262,6 +262,26 @@ document.body.appendChild(Example());
 // After the button click the DOM will be efficiently updated:
 // - The element with key 2 is moved to the first position.
 // - A new element with key 3 is created and appended.
+```
+
+### Conditional Rendering with If
+
+To conditionally render elements based on a reactive signal, use the `If` helper:
+
+```typescript
+import { signal, Div, If } from "doom-reactive-state";
+
+const [show, setShow] = signal(true);
+
+const app = Div([
+  If(show,
+    () => Div({}, ["Visible!"]),
+    () => Div({}, ["Hidden!"])
+  ),
+  Button({ onclick: () => setShow(s => !s) }, "Toggle")
+]);
+
+document.body.appendChild(app);
 ```
 
 # Contributing

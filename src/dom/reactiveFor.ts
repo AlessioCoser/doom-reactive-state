@@ -1,4 +1,4 @@
-import {Accessor, effect, signal} from "../reactivity";
+import {Accessor, Dispose, effect, signal} from "../reactivity";
 import {KeyedElement, KeyValue} from "./types";
 import {updateChildren} from "./updateChildren";
 
@@ -10,6 +10,8 @@ export function For<T>(
 }
 
 export class ReactiveFor<T> {
+  dispose: Dispose | undefined;
+
   constructor(
     private readonly items: Accessor<T[]>,
     private readonly each: (item: Accessor<T>) => KeyedElement
@@ -19,7 +21,7 @@ export class ReactiveFor<T> {
     const itemSignals = new Map<KeyValue, [Accessor<T>, (value: T) => void]>();
     let prev: ChildNode[] = [];
 
-    effect(() => {
+    this.dispose = effect(() => {
       const items = this.items();
       if (items.length === 0) {
         itemSignals.clear();

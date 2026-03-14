@@ -1,4 +1,4 @@
-import {effect} from "../reactivity";
+import {effect, Dispose} from "../reactivity";
 import {ReactiveFor} from "./reactiveFor";
 import {
     Child,
@@ -125,14 +125,14 @@ function prepareArguments<K extends keyof HTMLTag>(a: unknown, b: unknown) {
     return {properties: a as DoomProperties<K>, children: b as Children};
 }
 
-function reactOn<T>(value: Reactive<T>, apply: (next: T) => void) {
+function reactOn<T>(value: Reactive<T>, apply: (next: T) => void): Dispose | undefined {
     if (typeof value !== "function") {
         apply(value);
         return;
     }
 
     let prevValue: T;
-    effect(() => {
+    return effect(() => {
         const newValue = (value as Function)()
         if (newValue !== prevValue) {
             apply(newValue)

@@ -4,8 +4,10 @@ import { _createSignal } from "./signal";
 
 export function derive<T>(initial: T, fn: Derivation<T>): Accessor<T> {
   const derived = _createSignal(initial);
-  _createEffect(() => derived.set(fn(derived.get())), derived);
-  return derived.get.bind(derived);
+  const dispose = _createEffect(() => derived.set(fn(derived.get())), derived);
+  const accessor = derived.get.bind(derived) as Accessor<T> & { dispose: () => void };
+  accessor.dispose = dispose;
+  return accessor;
 }
 
 export function d(

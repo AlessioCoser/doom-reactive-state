@@ -5,6 +5,7 @@ export class Subscriptions {
   private currentSubscriber: Subscriber | null = null;
   private ancestors = new MapArray<_Signal<any>, _Signal<any>>();
   private subscriptions = new MapArray<_Signal<any>, Subscriber>();
+  private subscriberSignals = new MapArray<Subscriber, _Signal<any>>();
 
   run(subscriber: Subscriber, fn: () => void): void {
     this.currentSubscriber = subscriber;
@@ -27,13 +28,23 @@ export class Subscriptions {
 
     this._getAncestors(signal).forEach((ancestor) => {
       this.subscriptions.addTo(ancestor, subscriber);
+      this.subscriberSignals.addTo(subscriber, ancestor);
     });
+  }
+
+  unsubscribe(subscriber: Subscriber): void {
+    subscriber.disposed = true;
+    const signals = this.subscriberSignals.get(subscriber);
+    for (const signal of signals) {
+      this.subscriptions.removeFrom(signal, subscriber);
+    }
+    this.subscriberSignals.delete(subscriber);
   }
 
   executeAllSubscriptionsTo(signal: _Signal<any>) {
     this.subscriptions
       .get(signal)
-      .filter((subscription) => subscription !== this.currentSubscriber)
+      .filter((subscription) => subscription !== this.currentSubscriber && !subscription.disposed)
       .forEach((subscriber) => subscriber.execute());
   }
 

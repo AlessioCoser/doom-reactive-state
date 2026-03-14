@@ -234,4 +234,91 @@ describe("reactivity", () => {
       "Third -> 7 + 7 = 14",
     ]);
   });
+
+  describe("dispose", () => {
+    it("effect() returns a dispose function", () => {
+      const [get] = signal(0);
+      const dispose = effect(() => get());
+
+      expect(typeof dispose).toBe("function");
+    });
+
+    it("disposed effect is not called on signal change", () => {
+      const calls: number[] = [];
+      const [get, set] = signal(0);
+
+      const dispose = effect(() => calls.push(get()));
+      expect(calls).toEqual([0]);
+
+      dispose();
+      set(1);
+      set(2);
+
+      expect(calls).toEqual([0]);
+    });
+
+    it("dispose is idempotent", () => {
+      const [get] = signal(0);
+      const dispose = effect(() => get());
+
+      dispose();
+      dispose();
+    });
+
+    it("disposing one effect does not affect others on same signal", () => {
+      const calls1: number[] = [];
+      const calls2: number[] = [];
+      const [get, set] = signal(0);
+
+      const dispose1 = effect(() => calls1.push(get()));
+      effect(() => calls2.push(get()));
+
+      dispose1();
+      set(1);
+
+      expect(calls1).toEqual([0]);
+      expect(calls2).toEqual([0, 1]);
+    });
+
+    it("effect dispose with multiple signals", () => {
+      const calls: string[] = [];
+      const [getA, setA] = signal("a");
+      const [getB, setB] = signal("b");
+
+      const dispose = effect(() => calls.push(`${getA()}-${getB()}`));
+      expect(calls).toEqual(["a-b"]);
+
+      dispose();
+      setA("x");
+      setB("y");
+
+      expect(calls).toEqual(["a-b"]);
+    });
+
+    it("derived signal .dispose() stops recomputation", () => {
+      const [get, set] = signal(1);
+      const doubled = derive(0, () => get() * 2);
+
+      expect(doubled()).toEqual(2);
+      set(5);
+      expect(doubled()).toEqual(10);
+
+      (doubled as any).dispose();
+      set(10);
+
+      expect(doubled()).toEqual(10);
+    });
+
+    it("derived signal returns last value after dispose", () => {
+      const [get, set] = signal(3);
+      const doubled = derive(0, () => get() * 2);
+
+      expect(doubled()).toEqual(6);
+      (doubled as any).dispose();
+
+      expect(doubled()).toEqual(6);
+      set(100);
+      expect(doubled()).toEqual(6);
+    });
+  });
 });

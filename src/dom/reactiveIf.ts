@@ -1,4 +1,4 @@
-import {Accessor, effect} from "../reactivity";
+import {Accessor, Dispose, effect} from "../reactivity";
 
 export function If(
     condition: Accessor<boolean>,
@@ -9,6 +9,8 @@ export function If(
 }
 
 export class ReactiveIf {
+    dispose: Dispose | undefined;
+
     constructor(
         private readonly condition: Accessor<boolean>,
         private readonly ifTrue: () => Element,
@@ -20,7 +22,7 @@ export class ReactiveIf {
         let prevNode: ChildNode | null = null;
         let prevCondition: boolean | null = null;
 
-        effect(() => {
+        this.dispose = effect(() => {
             const isTrue = this.condition();
             if (isTrue === prevCondition) {
                 return;
